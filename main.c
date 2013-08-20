@@ -1,7 +1,12 @@
-#include<studio.h>
+#include <avr/interrupt.h>
 
-int main(){
 
-printf("test");
+ISR( INT0_vect )
+{
+}
 
+
+int main()
+{
+    while(1);
 }
