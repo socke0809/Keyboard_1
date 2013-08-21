@@ -5,25 +5,32 @@ enum ps2ReceiveState = {
 	parity  =   9, 
 	stop    =   10
 };
-char clk;
-char data;
+
+enum ps2ReceivesState state;
 
 
 ISR( INT0_vect )
 {
-	if(clk == 0){
-		if((ps2ReceiveState > 0) && (ps2ReceiveState < 9)){ 
+	switch(state){
+		case start:
+			//TODO 0 übertragen
+			state++;
+			break;
+		case parity:
+			//TODO parity
+			state++;
+			break;
+		case stop:
+			state = 0;
+			break;
+		default:
 			//TODO: read data
 			ps2ReceiveState++;
-			}
-		else if(Ps2ReceiveState == 9){			//parity bit
-			//TODO: parity bit 
-			ps2ReceiveState++;
-			}
-		else{									//stop bit
-			ps2ReceiveState = 0;
-			}
-		}
+			break;
+	}
+	
+}
+}
 	
 	
 
