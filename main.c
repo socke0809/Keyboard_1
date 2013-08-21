@@ -1,7 +1,8 @@
 #include <avr/interrupt.h>
 
 enum ps2ReceiveState {
-	start   =   0, 
+	start   =   0,
+	data	=	1,
 	parity  =   9, 
 	stop    =   10
 };
@@ -14,14 +15,14 @@ ISR( INT0_vect )
 	switch(state){
 		case start:
 			//TODO 0 übertragen
-			state++;
+			state =	data;
 			break;
 		case parity:
 			//TODO parity
-			state++;
+			state =	stop;
 			break;
 		case stop:
-			state = 0;
+			state = start;
 			break;
 		default:
 			//TODO: read data
