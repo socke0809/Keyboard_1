@@ -1,5 +1,14 @@
 #include <avr/interrupt.h>
 
+#define PS2_FLAG_RCV_COMPLETE_1 1
+#define PS2_FLAG_RCV_COMPLETE_2 (1<<2)
+#define PS2_FLAG_RCV_COMPLETE_3 (1<<3)
+#define PS2_FLAG_RCV_COMPLETE_4 (1<<4)
+#define PS2_FLAG_RCV_COMPLETE_5 (1<<5)
+#define PS2_FLAG_RCV_COMPLETE_6 (1<<6)
+#define PS2_FLAG_RCV_COMPLETE_7 (1<<7)
+#define PS2_FLAG_RCV_COMPLETE_8 (1<<8)
+
 enum ps2ReceiveState {
 	start   =   0,
 	data	=	1,
@@ -8,7 +17,7 @@ enum ps2ReceiveState {
 };
 
 enum ps2ReceiveState state = start;
-
+char PS2_FLAG_RCV_COMPLETE;
 
 ISR( INT0_vect )
 {
