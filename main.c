@@ -1,12 +1,12 @@
 #include <avr/interrupt.h>
 
-enum ps2ReceiveState = {
+enum ps2ReceiveState {
 	start   =   0, 
 	parity  =   9, 
 	stop    =   10
 };
 
-enum ps2ReceivesState state;
+enum ps2ReceiveState state = start;
 
 
 ISR( INT0_vect )
@@ -25,11 +25,10 @@ ISR( INT0_vect )
 			break;
 		default:
 			//TODO: read data
-			ps2ReceiveState++;
+			state++;
 			break;
 	}
 	
-}
 }
 	
 	
