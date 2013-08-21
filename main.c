@@ -1,53 +1,49 @@
 #include <avr/interrupt.h>
+#include "main.h"
 
-#define PS2_FLAG_RCV_COMPLETE 1
-#define PS2_FLAG_CORRECT_PARITY 1
 
-enum ps2ReceiveState {
-	start   =   0,
-	data	=	1,
-	parity  =   9, 
-	stop    =   10
-};
+enum ps2ReceiveState    state       = start;
+volatile uint8_t        ps2FlagRcv  = 0;
 
-enum ps2ReceiveState state = start;
-volatile uint8_t PS2_FLAG;
 
 ISR( INT0_vect )
 {
 	switch(state){
 		case start:
-			//TODO 0 übertragen
+			//TODO prüfen ob 0 übertragen wurde
 			state =	data;
 			break;
+
 		case parity:
-			//TODO parity
-				// wenn parity ist falsch
-				PS2_FLAG_CORRECT_PARITY = 0;
+			//TODO parity check
+				//TODO: wenn parity ist falsch
+                //TODO: setze error flag
 			state =	stop;
 			break;
+
 		case stop:
-			PS2_FLAG_RCV_COMPLETE = 1;
+            //TODO: prüfen ob 1 übertragen wurde
+            //TODO: setze complete flag
 			state = start;
 			break;
+            
 		default:
 			//TODO: read data
 			state++;
 			break;
+
 	}
-	
 }
-	
-	
 
 
 int main()
 {
 	sei();
-	
-	
+
+
     while(1){
-	if(PS2_FLAG_CORRECT_PARITY){
-	//TODO Translate
-	}
+        if( 1 ){ // TODO: check if transfer complete and no error occured
+            //TODO Translate
+        }
+    }
 }
