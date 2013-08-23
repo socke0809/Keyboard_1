@@ -13,16 +13,19 @@ volatile uint8_t        ps2DataByte;
 
 void ps2_send_byte(){
 	ps2Flag 	= PS2_FLAG_SENDING;
-	PS2_CLK_DDR |= (1<<PS2_CLK);
-	PS2_CLK_PORT &= ~(1<<PS2_CLK);
+	PS2_CLK_DDR |= (1<<PS2_CLK); //sets clk as output 
+	PS2_CLK_PORT &= ~(1<<PS2_CLK); //sets clk low
 	_delay_us( 100 );
+	PS2_DATA_DDR |= (1<<PS2_DATA); //sets data output
+	PS2_DATA_PORT &= ~(1<<PS2_DATA);
+	PS2_CLK_DDR &= ~(1<<PS2_CLK);
+
 	
 	
 }
 
-void ps2_receive_byte(){
-	ps2Flag 	= PS2_FLAG_RECEIVING;
-	PS2_CLK_DDR &= ~(1<<PS2_CLK);
+void ps2_receive_byte(uint8_t x){
+if()
 	
 }
 
@@ -31,7 +34,7 @@ ISR( INT0_vect )
 {
 	int loopCount = 8;
 	int ps2ParityControl = 0;
-	if(ps2Flag 	== PS2_FLAG_RECEIVING){
+	if(ps2Flag 	!= PS2_FLAG_SENDING){
 		switch(state){
 			case start:
 				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
