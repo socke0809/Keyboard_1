@@ -6,8 +6,8 @@
 
 
 enum ps2ReceiveState    state       = start;
-volatile uint8_t        ps2RcvFlag  = 0;
-volatile uint8_t        ps2RcvDataByte;
+volatile uint8_t        ps2Flag  = 0;
+volatile uint8_t        ps2DataByte;
 
 
 
@@ -17,58 +17,72 @@ ISR( INT0_vect )
 {
 	int loopCount = 8;
 	int ps2ParityControl = 0;
-	int bitCount = 0;
-	switch(state){
-		case start:
-			if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
-				state 		=	data;
-				ps2RcvDataByte	=	0;
-			}
-			break;
+	if(/*bedingung für Senden*/ ){
+		switch(state){
+			case start:
+				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
+					state 		=	data;
+					ps2DataByte	=	0;
+				}
+				break;
 
-		case parity:
+			case parity:
 			
-			while(loopCount--){
-				ps2ParityControl	^= 	ps2RcvDataByte&1;
-				ps2RcvDataByte		<<=	1;
-			}
-			if(PS2_DATA != ps2ParityControl){
-				ps2RcvFlag	|=	PS2_RCV_FLAG_ERROR ;
-			}
+				while(loopCount--){
+					ps2ParityControl	^= 	ps2DataByte&1;
+					ps2DataByte		<<=	1;
+				}
+				if(PS2_DATA != ps2ParityControl){
+					ps2Flag	|=	PS2_FLAG_ERROR ;
+				}
 				state	=	stop;
-			break;
+				break;
 
-		case stop:
-            if(PS2_DATA_PIN & (1<<PS2_DATA)){	// prüft stopbit = 1
-					ps2RcvFlag	|=	PS2_RCV_FLAG_COMPLETE;
-					state        =	start;
-			}
-			break;
+			case stop:
+				if(PS2_DATA_PIN & (1<<PS2_DATA)){	// prüft stopbit = 1
+						ps2Flag	|=	PS2_FLAG_COMPLETE;
+						ps2Flag	&=	~(PS2_FLAG_RECEIVING);
+				}
+				else{
+					ps2Flag	|=	PS2_FLAG_ERROR;
+					ps2Flag	&=	~(PS2_FLAG_RECEIVING);
+				}
+				state        =	start;
+			
+				break;
             
-		default:
-			if(PS2_DATA_PIN & (1<<PS2_DATA)){ 
-				ps2RcvDataByte |= (1<<bitCount);
+			default:
+				ps2DataByte >>= 1;
+				if(PS2_DATA_PIN & (1<<PS2_DATA)){ 
+					ps2DataByte |= (1<<7);
 				}
-			else{
-				ps2RcvDataByte &= ~(1<<bitCount);
+				else{
+					ps2DataByte &= ~(1<<7));
 				}
-			bitCount++;
-			state++;
-			ps2RcvFlag  |=	PS2_RCV_FLAG_RECEIVING;
-			break;
-
+				state++;
+				ps2Flag  |=	PS2_FLAG_RECEIVING;
+				break;
+		}
 	}
+	else{
+		}
+				
+	
+				
 }
 
 
 int main()
-{
+{	
+	
 	sei();
 
 
     while(1){
-        if(ps2RcvFlag){ // TODO: check if transfer complete and no error occured 
+        if(ps2Flag & PS2_FLAG_COMPLETE){ //check if transfer complete 
+			if(!(ps2Flag & PS2_FLAG_ERROR)){ //and no error occured 
             //TODO Translate
+			}
         }
     }
 }
