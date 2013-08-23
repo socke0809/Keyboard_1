@@ -1,23 +1,37 @@
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include "main.h"
 
 
 
 
 
-enum ps2ReceiveState    state       = start;
+enum ps2State    state    = start;
 volatile uint8_t        ps2Flag  = 0;
 volatile uint8_t        ps2DataByte;
 
 
+void ps2_send_byte(){
+	ps2Flag 	= PS2_FLAG_SENDING;
+	PS2_CLK_DDR |= (1<<PS2_CLK);
+	PS2_CLK_PORT &= ~(1<<PS2_CLK);
+	_delay_us( 100 );
+	
+	
+}
 
+void ps2_receive_byte(){
+	ps2Flag 	= PS2_FLAG_RECEIVING;
+	PS2_CLK_DDR &= ~(1<<PS2_CLK);
+	
+}
 
 
 ISR( INT0_vect )
 {
 	int loopCount = 8;
 	int ps2ParityControl = 0;
-	if(/*bedingung für Senden*/ ){
+	if(ps2Flag 	== PS2_FLAG_RECEIVING){
 		switch(state){
 			case start:
 				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
@@ -57,7 +71,7 @@ ISR( INT0_vect )
 					ps2DataByte |= (1<<7);
 				}
 				else{
-					ps2DataByte &= ~(1<<7));
+					ps2DataByte &= ~((1<<7));
 				}
 				state++;
 				ps2Flag  |=	PS2_FLAG_RECEIVING;
@@ -65,7 +79,8 @@ ISR( INT0_vect )
 		}
 	}
 	else{
-		}
+		
+	}
 				
 	
 				
