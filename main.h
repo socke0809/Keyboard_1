@@ -1,10 +1,12 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-#define PS2_FLAG_COMPLETE   (1<<0)
-#define PS2_FLAG_RECEIVING  (1<<1)
-#define PS2_FLAG_ERROR      (1<<2)
-#define PS2_FLAG_SENDING	(1<<3)
+#define PS2_FLAG_RCV_COMPLETE   	(1<<0)
+#define PS2_FLAG_TRANSF_COMPLETE 	(1<<1)
+#define PS2_FLAG_RECEIVING			(1<<2)
+#define PS2_FLAG_ERROR				(1<<3)
+#define PS2_FLAG_SENDING			(1<<4)
+
 
 #define PS2_DATA        PD1
 #define PS2_DATA_PIN    PIND

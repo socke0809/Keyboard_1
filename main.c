@@ -6,9 +6,10 @@
 
 
 
-enum ps2State    state    = start;
-volatile uint8_t        ps2Flag  = 0;
-volatile uint8_t        ps2DataByte;
+enum ps2State    	state    = start;
+volatile uint8_t	ps2Flag  = 0;
+volatile uint8_t	ps2DataByte;
+
 
 
 void ps2_send_byte(){
@@ -19,22 +20,35 @@ void ps2_send_byte(){
 	PS2_DATA_DDR |= (1<<PS2_DATA); //sets data output
 	PS2_DATA_PORT &= ~(1<<PS2_DATA);
 	PS2_CLK_DDR &= ~(1<<PS2_CLK);
-
-	
-	
 }
 
-void ps2_receive_byte(uint8_t x){
-if()
-	
+void ps2_receive_byte(uint8_t *x){
+	if(ps2Flag & PS2_FLAG_RCV_COMPLETE){
+			(*x) = ps2DataByte;
+		}
 }
 
+int parity_control(uint8_t x){
+	int loopCount = 8;
+	int ps2ParityControl = 0;
+	while(loopCount--){
+		ps2ParityControl	^= 	x&1;
+		x	<<=	1;
+		}
+	return ps2ParityControl;
+}
+
+void ps2_write_data(uint8_t x){
+	ps2DataByte = x;
+}
+
+	
+	
 
 ISR( INT0_vect )
 {
-	int loopCount = 8;
-	int ps2ParityControl = 0;
-	if(ps2Flag 	!= PS2_FLAG_SENDING){
+	
+	if(!(ps2Flag & PS2_FLAG_SENDING)){
 		switch(state){
 			case start:
 				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
@@ -44,12 +58,7 @@ ISR( INT0_vect )
 				break;
 
 			case parity:
-			
-				while(loopCount--){
-					ps2ParityControl	^= 	ps2DataByte&1;
-					ps2DataByte		<<=	1;
-				}
-				if(PS2_DATA != ps2ParityControl){
+				if(PS2_DATA != parity_control(ps2DataByte)){
 					ps2Flag	|=	PS2_FLAG_ERROR ;
 				}
 				state	=	stop;
@@ -57,7 +66,7 @@ ISR( INT0_vect )
 
 			case stop:
 				if(PS2_DATA_PIN & (1<<PS2_DATA)){	// prüft stopbit = 1
-						ps2Flag	|=	PS2_FLAG_COMPLETE;
+						ps2Flag	|=	PS2_FLAG_RCV_COMPLETE;
 						ps2Flag	&=	~(PS2_FLAG_RECEIVING);
 				}
 				else{
@@ -82,11 +91,50 @@ ISR( INT0_vect )
 		}
 	}
 	else{
-		
-	}
+		switch(state){
+			case start:
+				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
+					state 		=	data;
+				}
+				break;	
 				
+			case parity:
+				if(PS2_DATA != parity_control(ps2DataByte)){
+					ps2Flag	|=	PS2_FLAG_ERROR ;
+				}
+				state	=	stop;
+				break;
+				
+			case stop:
+				PS2_DATA_PORT |= (1<<PS2_DATA); //sets stopbit
+				PS2_DATA_DDR &= ~(1<<PS2_DATA);
+				state = acknowledge;
+				break;
+				
+			case acknowledge:
+				if(PS2_DATA_PIN &(1<<PS2_DATA)){
+					ps2Flag	|=	PS2_FLAG_ERROR; 
+				}
+				else{
+				ps2Flag  |= PS2_FLAG_TRANSF_COMPLETE;
+				}
+				state = start;
+				break;
+			
+			default:
+				ps2DataByte >>= 1;
+				if(!ps2DataByte){
+					PS2_DATA_PORT &= ~(1<<PS2_DATA);
+				}
+				else{
+					PS2_DATA_PORT |= (1<<PS2_DATA);
+				}
+				state++;
+				ps2Flag	|=	PS2_FLAG_SENDING; 
+				break;
+		}
+	}		
 	
-				
 }
 
 
@@ -97,8 +145,8 @@ int main()
 
 
     while(1){
-        if(ps2Flag & PS2_FLAG_COMPLETE){ //check if transfer complete 
-			if(!(ps2Flag & PS2_FLAG_ERROR)){ //and no error occured 
+        if(ps2Flag & PS2_FLAG_RCV_COMPLETE){ 
+			if(!(ps2Flag & PS2_FLAG_ERROR)){ 
             //TODO Translate
 			}
         }
