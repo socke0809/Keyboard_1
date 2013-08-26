@@ -18,6 +18,8 @@
 #define PS2_CLK_DDR     DDRD
 #define PS2_CLK_PORT    PORTD
 
+
+
 enum ps2State {
 	start   	=   0,
 	data		=	1,
