@@ -7,13 +7,16 @@
 
 
 enum ps2State    	state    = start;
-volatile uint8_t	ps2Flag  = 0;
+volatile uint8_t	ps2StateFlag  = 0;
 volatile uint8_t	ps2DataByte;
+volatile uint8_t	ps2CodeFlag = 0;
+
+
 
 
 
 void ps2_send_byte(uint8_t x){
-	ps2Flag 	= PS2_FLAG_SENDING;
+	ps2StateFlag 	= PS2_FLAG_SENDING;
 	ps2DataByte = x;
 	PS2_CLK_DDR |= (1<<PS2_CLK); //sets clk as output 
 	PS2_CLK_PORT &= ~(1<<PS2_CLK); //sets clk low
@@ -25,8 +28,8 @@ void ps2_send_byte(uint8_t x){
 }
 
 int8_t ps2_receive_byte(uint8_t *x){
-	if(ps2Flag & PS2_FLAG_RCV_COMPLETE){
-		if(!(ps2Flag & PS2_FLAG_ERROR)){
+	if(ps2StateFlag & PS2_FLAG_RCV_COMPLETE){
+		if(!(ps2StateFlag & PS2_FLAG_ERROR)){
 			(*x) = ps2DataByte;
 			return 0;
 		}
@@ -51,8 +54,17 @@ int parity_control(uint8_t x){
 }
 
 uint8_t getState(){
-	return ps2Flag;
+	return ps2StateFlag;
 }
+
+void ps2_init_keyboard(){
+	EICRA |= 0x02;
+	EICMSK |= 0x01;
+	SREG |= 0x40;
+	PS2_CLK_DDR &= ~(1<<PS2_CLK);
+	PS2_DATA_DDR &= ~(1<<PS2_DATA);
+}
+
 
 
 
@@ -62,7 +74,7 @@ uint8_t getState(){
 ISR( INT0_vect )
 {
 	
-	if(!(ps2Flag & PS2_FLAG_SENDING)){
+	if(!(ps2StateFlag & PS2_FLAG_SENDING)){
 		switch(state){
 			case start:
 				if(!(PS2_DATA_PIN & (1<<PS2_DATA))){	// überprüft startbit = 0 
@@ -73,19 +85,19 @@ ISR( INT0_vect )
 
 			case parity:
 				if(PS2_DATA != parity_control(ps2DataByte)){
-					ps2Flag	|=	PS2_FLAG_ERROR ;
+					ps2StateFlag	|=	PS2_FLAG_ERROR ;
 				}
 				state	=	stop;
 				break;
 
 			case stop:
 				if(PS2_DATA_PIN & (1<<PS2_DATA)){	// prüft stopbit = 1
-						ps2Flag	|=	PS2_FLAG_RCV_COMPLETE;
-						ps2Flag	&=	~(PS2_FLAG_RECEIVING);
+						ps2StateFlag	|=	PS2_FLAG_RCV_COMPLETE;
+						ps2StateFlag	&=	~(PS2_FLAG_RECEIVING);
 				}
 				else{
-					ps2Flag	|=	PS2_FLAG_ERROR;
-					ps2Flag	&=	~(PS2_FLAG_RECEIVING);
+					ps2StateFlag	|=	PS2_FLAG_ERROR;
+					ps2StateFlag	&=	~(PS2_FLAG_RECEIVING);
 				}
 				state        =	start;
 			
@@ -100,15 +112,17 @@ ISR( INT0_vect )
 					ps2DataByte &= ~((1<<7));
 				}
 				state++;
-				ps2Flag  |=	PS2_FLAG_RECEIVING;
+				ps2StateFlag  |=	PS2_FLAG_RECEIVING;
 				break;
 		}
+	
+		
 	}
 	else{
 		switch(state){
 			case parity:
 				if(PS2_DATA != parity_control(ps2DataByte)){
-					ps2Flag	|=	PS2_FLAG_ERROR ;
+					ps2StateFlag	|=	PS2_FLAG_ERROR ;
 				}
 				state	=	stop;
 				break;
@@ -122,13 +136,13 @@ ISR( INT0_vect )
 			case acknowledge:
 			
 				if(PS2_DATA_PIN &(1<<PS2_DATA)){
-					ps2Flag	|=	PS2_FLAG_ERROR; 
+					ps2StateFlag	|=	PS2_FLAG_ERROR; 
 				}
 				else{
-				ps2Flag  |= PS2_FLAG_TRANSF_COMPLETE;
+				ps2StateFlag  |= PS2_FLAG_TRANSF_COMPLETE;
 				
 				}
-				ps2Flag	&=	~(PS2_FLAG_SENDING);
+				ps2StateFlag	&=	~(PS2_FLAG_SENDING);
 				state = start;
 				break;
 			
@@ -141,7 +155,7 @@ ISR( INT0_vect )
 					PS2_DATA_PORT |= (1<<PS2_DATA);
 				}
 				state++;
-				ps2Flag	|=	PS2_FLAG_SENDING; 
+				ps2StateFlag	|=	PS2_FLAG_SENDING; 
 				ps2DataByte >>= 1;
 				break;
 		}
@@ -152,15 +166,15 @@ ISR( INT0_vect )
 
 int main()
 {	
+	state = start;
+	
+	
 	
 	sei();
 
 
     while(1){
-        if(ps2Flag & PS2_FLAG_RCV_COMPLETE){ 
-			if(!(ps2Flag & PS2_FLAG_ERROR)){ 
-            //TODO Translate
-			}
-        }
+       //TODO translate
+		
     }
 }
