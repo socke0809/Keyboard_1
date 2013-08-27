@@ -1,10 +1,11 @@
+#include <avr/io.h>
+#include <avr/interrupt.h>
 
+#include "ps2_hw.h"
 
 
 int main()
-{	
-	state = start;
-
+{
 	sei();
 
 
