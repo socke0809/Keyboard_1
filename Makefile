@@ -51,7 +51,7 @@ TARGET = main
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c ps2_hw.c
+SRC = $(TARGET).c ps2_hw.c uart.c
 
 
 # List Assembler source files here.

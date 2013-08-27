@@ -1,7 +1,7 @@
 #ifndef __PS2_HW_H__
 #define __PS2_HW_H__
 
-#include "inttypes.h"
+#include <inttypes.h>
 
 
 #define PS2_FLAG_RCV_COMPLETE   	(1<<0)
