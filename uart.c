@@ -3,15 +3,14 @@
 #include "uart.h"
 
 
-#define UART_UBRR ((F_CPU/(16*UART_BAUD))-1)
+#define UART_UBRR ((F_CPU/(16*UART_UART_BAUD))-1)
 
 
 void uart_init( void )
 {
-    UBRR0H = (uint8_t)(UART_UBRR>>8);
-    UBRR0L = (uint8_t)UART_UBRR;
+	UBRR0 = (uint16_t)103; //FIXME: probably shouldn't be a constant...
 
-    UCSR0B |= (1<<RXEN0);                   //enable Rx, disable interrupts
+    UCSR0B |= (1<<TXEN0);                   //enable Rx, disable interrupts
     UCSR0C |= (1<<UCSZ01) | (1<<UCSZ00);    //8n1
 }
 
