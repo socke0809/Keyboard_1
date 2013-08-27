@@ -37,7 +37,7 @@
 
 # MCU name
 MCU = atmega328
-AVRDUDE_MCU = m328
+AVRDUDE_MCU = m328p
 
 # Main Oscillator Frequency
 # This is only used to define F_CPU in all assembler and c-sources.
