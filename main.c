@@ -23,6 +23,13 @@ int main( void )
 		uint8_t data;
 		
 		uart_send_byte( ps2_hw_receive_byte(&data));
+		uart_send_byte(data);
+		uart_send_byte( ps2_hw_get_flags() );
+		uart_send_byte( 0xAA );
+		uart_send_byte( 0xAA );
+				_delay_ms(5);
+		
+		
 	
 	
        //TODO translate
