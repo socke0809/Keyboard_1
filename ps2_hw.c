@@ -43,7 +43,10 @@ void ps2_hw_init( void ){
 	PS2_HW_DATA_DDR &= ~(1<<PS2_HW_DATA);
 	PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA); //enable pullup
 	state  = start;
+	ps2HwFlags = 0;
 	
+	
+
 }
 
 
@@ -100,12 +103,12 @@ ISR( INT0_vect )
                 break;
 
             case stop:
+			  ps2HwFlags	&=	~(PS2_HW_FLAG_RECEIVING);
                 if(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)){	// prüft stopbit = 1
                     ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
-                    ps2HwFlags	&=	~(PS2_HW_FLAG_RECEIVING);
                 }else{
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
-                    ps2HwFlags	&=	~(PS2_HW_FLAG_RECEIVING);
+                  
                 }
                 state        =	start;
 

@@ -8,24 +8,30 @@
 
 int main( void )
 {
-	_delay_ms(5000); //dbg
-
     uart_init();
 	
 	ps2_hw_init();
 
 	sei();
+	
+	_delay_ms(1000); //dbg
 
 
     uart_send_string("---");// WELCOME TO PS2 CONTROLLER ---\n");
+	
+	uart_send_byte( ps2_hw_get_flags() );
+	
+	uart_send_string("---");
 
     while(1){
 	
 		uint8_t data;
 		int8_t ret;
+		//uart_send_byte( ps2_hw_get_flags() );
 		
 		ret = ps2_hw_receive_byte(&data);
 		if(ret != -1){
+		
 			uart_send_byte(ret);
 			uart_send_byte(data);
 			uart_send_byte( ps2_hw_get_flags() );
