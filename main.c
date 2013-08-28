@@ -3,6 +3,7 @@
 #include <avr/interrupt.h>
 
 #include "ps2_hw.h"
+#include "uart.h"
 
 
 int main( void )
@@ -16,20 +17,23 @@ int main( void )
 	sei();
 
 
-    uart_send_string("--- WELCOME TO PS2 CONTROLLER ---\n");
+    uart_send_string("---");// WELCOME TO PS2 CONTROLLER ---\n");
 
     while(1){
 	
 		uint8_t data;
+		int8_t ret;
 		
-		uart_send_byte( ps2_hw_receive_byte(&data));
-		uart_send_byte(data);
-		uart_send_byte( ps2_hw_get_flags() );
-		uart_send_byte( 0xAA );
-		uart_send_byte( 0xAA );
-				_delay_ms(5);
+		ret = ps2_hw_receive_byte(&data);
+		if(ret != -1){
+			uart_send_byte(ret);
+			uart_send_byte(data);
+			uart_send_byte( ps2_hw_get_flags() );
+			uart_send_byte( 0xAA );
+			uart_send_byte( 0xAA );
+		}
 		
-		
+		_delay_ms(20);
 	
 	
        //TODO translate

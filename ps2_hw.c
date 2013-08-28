@@ -39,7 +39,9 @@ void ps2_hw_init( void ){
 	EICRA |= 0x02;
 	EIMSK |= 0x01;
 	PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);
+	PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 	PS2_HW_DATA_DDR &= ~(1<<PS2_HW_DATA);
+	PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA); //enable pullup
 	state  = start;
 	
 }
