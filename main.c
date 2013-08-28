@@ -5,7 +5,7 @@
 #include "ps2_hw.h"
 
 
-int main()
+int main( void )
 {
 	_delay_ms(5000); //dbg
 
@@ -23,11 +23,6 @@ int main()
 		uint8_t data;
 		
 		uart_send_byte( ps2_hw_receive_byte(&data));
-	
-		uart_send_byte( data);
-		
-		
-		
 	
 	
        //TODO translate
