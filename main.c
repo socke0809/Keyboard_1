@@ -24,6 +24,11 @@ int main()
 		
 		uart_send_byte( ps2_hw_receive_byte(&data));
 	
+		uart_send_byte( data);
+		
+		
+		
+	
 	
        //TODO translate
     }
