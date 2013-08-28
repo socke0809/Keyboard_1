@@ -10,6 +10,8 @@ int main()
 	_delay_ms(5000); //dbg
 
     uart_init();
+	
+	ps2_hw_init();
 
 	sei();
 
@@ -17,6 +19,12 @@ int main()
     uart_send_string("--- WELCOME TO PS2 CONTROLLER ---\n");
 
     while(1){
+	
+		uint8_t data;
+		
+		uart_send_byte( ps2_hw_receive_byte(&data));
+	
+	
        //TODO translate
     }
 }
