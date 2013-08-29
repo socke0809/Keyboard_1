@@ -25,24 +25,26 @@ int main( void )
 	
 	
 	ps2_hw_send_byte(0xED);
-	
-	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE)){
-	//wait
-	}
+	uart_send_byte( ps2_hw_get_flags() );
+	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE));
+    _delay_ms(20);
+
+	ps2_hw_send_byte(0x05);
+	uart_send_byte( ps2_hw_get_flags() );
+	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE));
 	_delay_ms(20);
-	ps2_hw_send_byte(0b00000101);
-	
-	
+
+
+
+
 	uart_send_string("---");
 	
 	
 	
-	_delay_ms(20);
     while(1){
 	
 		uint8_t data;
 		int8_t ret;
-		//uart_send_byte( ps2_hw_get_flags() );
 		
 		
 		
@@ -58,7 +60,5 @@ int main( void )
 		
 		_delay_ms(1);
 	
-	
-       //TODO translate
     }
 }
