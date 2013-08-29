@@ -94,7 +94,6 @@ int8_t ps2_hw_receive_byte(uint8_t *x){
 
 ISR( INT0_vect )
 {
-	uint8_t count = 7;
     if(!(ps2HwFlags & PS2_HW_FLAG_SENDING)){
         switch(state){
             case start:
@@ -166,17 +165,14 @@ ISR( INT0_vect )
                 state = start;
                 break;
 
-            case data:
+            default:
 
                 if(ps2HwDataByte&1){
                     PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                 }else{
                     PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
                 }
-                count--;
-				if(count == 0){
-					state = parity;
-				}
+				state++;
                 ps2HwFlags	|=	PS2_HW_FLAG_SENDING; 
                 ps2HwDataByte >>= 1;
                 break;
