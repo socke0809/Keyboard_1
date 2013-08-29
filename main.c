@@ -29,7 +29,7 @@ int main( void )
 	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE)){
 	//wait
 	}
-	_delay_ms(5);
+	_delay_ms(20);
 	ps2_hw_send_byte(0b00000101);
 	
 	
@@ -37,7 +37,7 @@ int main( void )
 	
 	
 	
-
+	_delay_ms(20);
     while(1){
 	
 		uint8_t data;

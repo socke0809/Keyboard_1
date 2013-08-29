@@ -19,11 +19,10 @@ volatile uint8_t	ps2HwDataByte, temp;
 
 
 uint8_t parity_control(uint8_t x){
-    uint8_t loopCount = 8;
     uint8_t ps2ParityControl = 0;
-    while(loopCount--){
+    for(uint8_t i = 0; i<8; i++){
         ps2ParityControl	^= 	x&1;
-        x	<<=	1;
+        x	>>=	1;
     }
    return ps2ParityControl;
 }
@@ -95,6 +94,7 @@ int8_t ps2_hw_receive_byte(uint8_t *x){
 ISR( INT0_vect )
 {
     if(!(ps2HwFlags & PS2_HW_FLAG_SENDING)){
+	
         switch(state){
             case start:
                 if(!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA))){	// überprüft startbit = 0 
@@ -104,7 +104,7 @@ ISR( INT0_vect )
                 break;
 
             case parity:
-                if((PS2_HW_DATA_PIN & 1<<PS2_HW_DATA)&parity_control(ps2HwDataByte)){
+                if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA))&&parity_control(ps2HwDataByte)){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR ;
                 }
                 state	=	stop;
@@ -137,15 +137,18 @@ ISR( INT0_vect )
 
     }else{
         switch(state){
+			case start:
+			break;
             case parity:
-				if(!parity_control(temp)){
+				if(parity_control(temp)){
 					PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
 				}
 				else{
 					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
 				}
 				state	=	stop;
-                break;
+			break;
+               
 
             case stop:
                 PS2_HW_DATA_DDR &= ~(1<<PS2_HW_DATA);
@@ -157,10 +160,8 @@ ISR( INT0_vect )
 
                 if(PS2_HW_DATA_PIN &(1<<PS2_HW_DATA)){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR; 
-                }else{
-                    ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
-
                 }
+                ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
                 state = start;
                 break;
@@ -168,9 +169,9 @@ ISR( INT0_vect )
             default:
 
                 if(ps2HwDataByte&1){
-                    PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
-                }else{
                     PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
+                }else{
+                    PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                 }
 				state++;
                 ps2HwFlags	|=	PS2_HW_FLAG_SENDING; 
