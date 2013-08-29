@@ -15,7 +15,7 @@ enum ps2HwState {
 
 enum ps2HwState    	state    = start;
 volatile uint8_t	ps2HwFlags  = 0;
-volatile uint8_t	ps2HwDataByte;
+volatile uint8_t	ps2HwDataByte, temp;
 
 
 uint8_t parity_control(uint8_t x){
@@ -54,6 +54,7 @@ void ps2_hw_init( void ){
 void ps2_hw_send_byte(uint8_t x){
 	ps2HwFlags 	= PS2_HW_FLAG_SENDING;
 	ps2HwDataByte = x;
+	temp = x;
 	PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
 	EIMSK &= (0x00);						
 	PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);	//sets clk low
@@ -116,7 +117,7 @@ ISR( INT0_vect )
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
                   
                 }
-                state        =	start;
+                state 	=	start;
 
                 break;
 
@@ -136,12 +137,13 @@ ISR( INT0_vect )
     }else{
         switch(state){
             case parity:
-                if(!(PS2_HW_DATA_PIN &(1<<PS2_HW_DATA))){
-                    PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
-                }else{
-                    PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
-                }
-                state	=	stop;
+				if(!parity_control(temp)){
+					PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
+				}
+				else{
+					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
+				}
+				state	=	stop;
                 break;
 
             case stop:
