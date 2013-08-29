@@ -25,7 +25,14 @@ int main( void )
 	uart_send_string("---");
 	
 	ps2_hw_send_byte(0xED);
+	
+	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE)){
+	//wait
+	}
 	ps2_hw_send_byte(0b00000111);
+	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE)){
+	//wait
+	}
 	
 	
 	
