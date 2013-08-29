@@ -102,10 +102,11 @@ ISR( INT0_vect )
 
 
             case parity:
-                if(!((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte))){
-                    ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
-                }else{
-                    ps2HwFlags  &= ~PS2_HW_FLAG_ERROR;
+                if(((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA) && !parity_control(ps2HwDataByte)))){
+                    ps2HwFlags	&=	~PS2_HW_FLAG_ERROR;
+				}
+                else{
+                    ps2HwFlags  |= PS2_HW_FLAG_ERROR;
                 }
                 state	=	stop;
                 break;
@@ -157,7 +158,7 @@ ISR( INT0_vect )
 
             case acknowledge:
                 if(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)){ //should pull ACK low
-                    ps2HwFlags	|=	PS2_HW_FLAG_ERROR; 
+                    ps2HwFlags	|= PS2_HW_FLAG_ERROR; 
                 }else{
                     ps2HwFlags	&=	~PS2_HW_FLAG_ERROR; 
                 }
