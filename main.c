@@ -39,7 +39,7 @@ int main( void )
 			uart_send_byte( 0xAA );
 		}
 		
-		_delay_ms(20);
+		_delay_ms(1);
 	
 	
        //TODO translate

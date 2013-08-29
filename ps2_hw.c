@@ -25,7 +25,7 @@ uint8_t parity_control(uint8_t x){
         ps2ParityControl	^= 	x&1;
         x	<<=	1;
     }
-    return ps2ParityControl;
+   return ps2ParityControl;
 }
 
 
@@ -96,7 +96,7 @@ ISR( INT0_vect )
                 break;
 
             case parity:
-                if(PS2_HW_DATA != parity_control(ps2HwDataByte)){
+                if((PS2_HW_DATA_PIN & 1<<PS2_HW_DATA)&parity_control(ps2HwDataByte)){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR ;
                 }
                 state	=	stop;
@@ -130,7 +130,7 @@ ISR( INT0_vect )
     }else{
         switch(state){
             case parity:
-                if(PS2_HW_DATA != parity_control(ps2HwDataByte)){
+                if((PS2_HW_DATA_PIN & 1<<PS2_HW_DATA)&parity_control(ps2HwDataByte)){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR ;
                 }
                 state	=	stop;

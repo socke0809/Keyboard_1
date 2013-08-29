@@ -11,7 +11,7 @@
 #define PS2_HW_FLAG_SENDING	    		(1<<4)
 
 
-#define PS2_HW_DATA        PD1
+#define PS2_HW_DATA        PD3
 #define PS2_HW_DATA_PIN    PIND
 #define PS2_HW_DATA_DDR    DDRD
 #define PS2_HW_DATA_PORT   PORTD
