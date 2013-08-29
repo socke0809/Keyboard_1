@@ -52,6 +52,7 @@ void ps2_hw_init( void ){
 
 
 void ps2_hw_send_byte(uint8_t x){
+	
 	ps2HwFlags 	= PS2_HW_FLAG_SENDING;
 	ps2HwDataByte = x;
 	temp = x;
@@ -64,6 +65,7 @@ void ps2_hw_send_byte(uint8_t x){
 	PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
 	PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);
 	PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
+	state = data;
 	
 	
 	
@@ -92,7 +94,7 @@ int8_t ps2_hw_receive_byte(uint8_t *x){
 
 ISR( INT0_vect )
 {
-
+	uint8_t count = 7;
     if(!(ps2HwFlags & PS2_HW_FLAG_SENDING)){
         switch(state){
             case start:
@@ -171,7 +173,10 @@ ISR( INT0_vect )
                 }else{
                     PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA);
                 }
-                state++;
+                count--;
+				if(count == 0){
+					state = parity;
+				}
                 ps2HwFlags	|=	PS2_HW_FLAG_SENDING; 
                 ps2HwDataByte >>= 1;
                 break;

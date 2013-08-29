@@ -27,7 +27,7 @@ int main( void )
 	ps2_hw_send_byte(0xED);
 	
 	while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE)){
-	//wait
+	wait
 	}
 	_delay_ms(5);
 	ps2_hw_send_byte(0b00000101);
@@ -42,7 +42,7 @@ int main( void )
 	
 		uint8_t data;
 		int8_t ret;
-		uart_send_byte( ps2_hw_get_flags() );
+		//uart_send_byte( ps2_hw_get_flags() );
 		
 		
 		
