@@ -86,6 +86,8 @@ int8_t ps2_hw_receive_byte(uint8_t *x){
 	else{
 		return -1;
 	}
+	
+
 		
 }
 
@@ -104,7 +106,7 @@ ISR( INT0_vect )
                 break;
 
             case parity:
-                if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA))&&parity_control(ps2HwDataByte)){
+                if(!((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA))&&parity_control(ps2HwDataByte))){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR ;
                 }
                 state	=	stop;
@@ -161,7 +163,7 @@ ISR( INT0_vect )
                 if(PS2_HW_DATA_PIN &(1<<PS2_HW_DATA)){
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR; 
                 }
-                ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
+                ps2HwFlags  = PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
                 state = start;
                 break;
