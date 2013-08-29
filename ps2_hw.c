@@ -139,6 +139,8 @@ ISR( INT0_vect )
             case stop:
                 PS2_HW_DATA_PORT |= (1<<PS2_HW_DATA); //sets stopbit
                 PS2_HW_DATA_DDR &= ~(1<<PS2_HW_DATA);
+	
+				
                 state = acknowledge;
                 break;
 

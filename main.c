@@ -21,13 +21,23 @@ int main( void )
 	
 	uart_send_byte( ps2_hw_get_flags() );
 	
+	
 	uart_send_string("---");
+	
+	ps2_hw_send_byte(0xED);
+	ps2_hw_send_byte(0b00000111);
+	
+	
+	
+	
 
     while(1){
 	
 		uint8_t data;
 		int8_t ret;
-		//uart_send_byte( ps2_hw_get_flags() );
+		uart_send_byte( ps2_hw_get_flags() );
+		
+		
 		
 		ret = ps2_hw_receive_byte(&data);
 		if(ret != -1){
