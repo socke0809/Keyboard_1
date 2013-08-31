@@ -27,18 +27,23 @@ void ps2_buffer_write(uint8_t data){
 	}
 	ps2Buffer[write] = data;
 	write++;
-	if(write >= size){
+	if(write == size){
 		write = 0;
 	}
 }
 
 uint8_t ps2_buffer_read(){
+uint8_t key;
 	if(read == write){ //buffer empty
 		return NULL;
 	}
 	else{
-		return ps2Buffer[read];
+		key = ps2Buffer[read];
 		read++;
+		if(read== size){
+			read = 0;
+		}
+		return key;
 	}
 }
 		
