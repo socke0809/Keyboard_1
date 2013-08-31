@@ -19,33 +19,37 @@ volatile uint8_t	ps2HwDataByte, temp;
 volatile uint8_t 	ps2Buffer[buffersize];
 volatile uint8_t	read;
 volatile uint8_t	write;
+volatile uint8_t	ps2BufFlags = 0;
 
 
 int8_t ps2_buffer_write(uint8_t data){
-	if(write==read){ //buffer full
+	if((write==read)&&(!(ps2BufFlags&PS2_BUFFER_EMPTY))){//buffer full
+		ps2BufFlags = PS2_BUFFER_FULL;
 		return -1;
 	}
 	ps2Buffer[write] = data;
 	write++;
+	ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
 	if(write == size){
 		write = 0;
-		return 0;
 	}
+	return 0;
 }
 
 int8_t ps2_buffer_read(uint8_t *x){
 
-	if(read == write){ //buffer empty
+	if(read == write)&&(!(ps2BufFlags&PS2_BUFFER_FULL)){ //buffer empty
+		ps2BufFlags = PS2_BUFFER_EMPTY;
 		return -1;
 	}
-	else{
-		(*x)= ps2Buffer[read];
-		read++;
-		if(read== size){
+	(*x) = ps2[read];
+	read++;
+	ps2BufFlags &= ~(PS2_BUFFER_FULL)
+	
+	if(read == size){
 			read = 0;
-		}
-		return 0;
 	}
+	return 0;
 }
 		
 
@@ -103,7 +107,7 @@ void ps2_hw_send_byte(uint8_t x){
 }
 
 
-int8_t ps2_hw_receive_byte(uint8_t x){
+int8_t ps2_hw_receive_byte(uint8_t *x){
     if(ps2HwFlags & PS2_HW_FLAG_RCV_COMPLETE){
         ps2HwFlags &= ~PS2_HW_FLAG_RCV_COMPLETE;
         (*x) = ps2HwDataByte;
