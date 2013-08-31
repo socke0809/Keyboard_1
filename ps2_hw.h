@@ -20,6 +20,7 @@
 #define PS2_HW_CLK_DDR     DDRD
 #define PS2_HW_CLK_PORT    PORTD
 
+#define PS2
 
 void ps2_hw_init( void );
 

@@ -16,6 +16,32 @@ enum ps2HwState {
 enum ps2HwState    	state    = start;
 volatile uint8_t	ps2HwFlags  = 0;
 volatile uint8_t	ps2HwDataByte, temp;
+volatile uint8_t 	ps2Buffer[buffersize];
+volatile uint8_t	read;
+volatile uint8_t	write;
+
+
+void ps2_buffer_write(uint8_t data){
+	if(write==read){ //buffer full
+		write = 0;
+	}
+	ps2Buffer[write] = data;
+	write++;
+	if(write >= size){
+		write = 0;
+	}
+}
+
+uint8_t ps2_buffer_read(){
+	if(read == write){ //buffer empty
+		return NULL;
+	}
+	else{
+		return ps2Buffer[read];
+		read++;
+	}
+}
+		
 
 
 uint8_t parity_control(uint8_t x){
@@ -102,11 +128,13 @@ ISR( INT0_vect )
 
 
             case parity:
-                if(((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA) && !parity_control(ps2HwDataByte)))){
-                    ps2HwFlags	&=	~PS2_HW_FLAG_ERROR;
+                if(
+				((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
+				){
+                    ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
 				}
                 else{
-                    ps2HwFlags  |= PS2_HW_FLAG_ERROR;
+                    ps2HwFlags  &=~ PS2_HW_FLAG_ERROR;
                 }
                 state	=	stop;
                 break;
