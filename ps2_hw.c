@@ -21,29 +21,30 @@ volatile uint8_t	read;
 volatile uint8_t	write;
 
 
-void ps2_buffer_write(uint8_t data){
+int8_t ps2_buffer_write(uint8_t data){
 	if(write==read){ //buffer full
-		write = 0;
+		return -1;
 	}
 	ps2Buffer[write] = data;
 	write++;
 	if(write == size){
 		write = 0;
+		return 0;
 	}
 }
 
-uint8_t ps2_buffer_read(){
-uint8_t key;
+int8_t ps2_buffer_read(uint8_t *x){
+
 	if(read == write){ //buffer empty
-		return NULL;
+		return -1;
 	}
 	else{
-		key = ps2Buffer[read];
+		(*x)= ps2Buffer[read];
 		read++;
 		if(read== size){
 			read = 0;
 		}
-		return key;
+		return 0;
 	}
 }
 		
@@ -102,11 +103,11 @@ void ps2_hw_send_byte(uint8_t x){
 }
 
 
-int8_t ps2_hw_receive_byte(uint8_t *x){
+int8_t ps2_hw_receive_byte(uint8_t x){
     if(ps2HwFlags & PS2_HW_FLAG_RCV_COMPLETE){
         ps2HwFlags &= ~PS2_HW_FLAG_RCV_COMPLETE;
         (*x) = ps2HwDataByte;
-        if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
+		if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
             return 0;
         }
         else{
