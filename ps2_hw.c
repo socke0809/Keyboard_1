@@ -81,6 +81,10 @@ void ps2_hw_init( void ){
     //enable interrupt
     EICRA |= 0x02; //TODO
     EIMSK |= 0x01; //TODO
+	
+	read = 0;
+	write = 0;
+	ps2BufFlag = PS2_BUFFER_EMPTY;
 }
 
 
@@ -156,6 +160,7 @@ ISR( INT0_vect )
 
                 }
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
+				ps2_buffer_write(ps2HwDataByte);
                 state 	=	start;
                 break;
 
