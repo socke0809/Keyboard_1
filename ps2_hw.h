@@ -20,8 +20,11 @@
 #define PS2_HW_CLK_DDR     DDRD
 #define PS2_HW_CLK_PORT    PORTD
 
-#define PS2_BUFFER_EMPTY (1<<0);
-#define PS2_BUFFER_FULL	 (1<<1);
+#define PS2_RCV_BUFFER_EMPTY 	(1<<0);
+#define PS2_RCV_BUFFER_FULL	 	(1<<1);
+#define PS2_SEND_BUFFER_EMPTY 	(1<<2);
+#define PS2_SEND_BUFFER_FULL	(1<<3);
+
 
 void ps2_hw_init( void );
 
