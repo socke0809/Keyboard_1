@@ -25,6 +25,8 @@
 #define PS2_SEND_BUFFER_EMPTY 	(1<<2);
 #define PS2_SEND_BUFFER_FULL	(1<<3);
 
+#define sendBufSize  16;
+#define rcvBufSize  16;
 
 void ps2_hw_init( void );
 
