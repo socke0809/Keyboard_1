@@ -19,11 +19,12 @@ struct ps2Buffer{
 	uint8_t	ps2BufFlags;
 }
 	
-enum ps2HwState    	state    = start;
-volatile uint8_t	ps2HwFlags  = 0;
-volatile uint8_t	ps2HwDataByte, temp;
-struct ps2Buffer	*sendBuffer;
-struct ps2Buffer	*rcvBuffer;
+enum ps2HwState    	state = start;
+volatile uint8_t	ps2HwFlags = 0;
+volatile uint8_t	ps2HwDataByte;
+volatile uint8_t	temp;
+//struct ps2Buffer	*sendBuffer;
+//struct ps2Buffer	*rcvBuffer;
 
 int8_t ps2_buffer_write(uint8_t data, ps2Buffer *buf){
 	if((buf->write==buf->read) && (!(buf->ps2BufFlags & PS2_BUFFER_EMPTY))){//buffer full
@@ -39,13 +40,12 @@ int8_t ps2_buffer_write(uint8_t data, ps2Buffer *buf){
 	return 0;
 }
 
-int8_t ps2_buffer_read(uint8_t *x, ps2Buffer *buf){
-
-	if(buf->read == buf->write) && (!(buf->s2BufFlags & PS2_BUFFER_FULL)){ //buffer empty
+int8_t ps2_buffer_read(uint8_t *data, ps2Buffer *buf){
+	if(buf->read == buf->write) && (!(buf->ps2BufFlags & PS2_BUFFER_FULL)){ //buffer empty
 		buf->ps2BufFlags = PS2_BUFFER_EMPTY;
 		return -1;
 	}
-	(*x) = buf->buffer[buf->read];
+	(*data) = buf->buffer[buf->read];
 	buf->read++;
 	buf->ps2BufFlags &= ~(PS2_BUFFER_FULL)
 	
@@ -54,7 +54,7 @@ int8_t ps2_buffer_read(uint8_t *x, ps2Buffer *buf){
 	}
 	return 0;
 }
-		
+	
 
 
 uint8_t parity_control(uint8_t x){
