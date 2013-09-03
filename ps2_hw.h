@@ -29,9 +29,9 @@ void ps2_hw_init( void );
 
 uint8_t ps2_hw_get_flags( void );
 
-void ps2_hw_send_byte(uint8_t x);
+void ps2_hw_send_byte( uint8_t data);
 
-int8_t ps2_hw_receive_byte(uint8_t *x);
+int8_t ps2_hw_receive_byte(uint8_t *data);
 
 
 
