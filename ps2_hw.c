@@ -12,42 +12,45 @@ enum ps2HwState {
     acknowledge	= 	11
 };
 
-
+struct ps2Buffer{
+	uint8_t buffer[PS2_BUFFER_SIZE];
+	uint8_t	read;
+	uint8_t	write;
+	uint8_t	ps2BufFlags;
+}
+	
 enum ps2HwState    	state    = start;
 volatile uint8_t	ps2HwFlags  = 0;
 volatile uint8_t	ps2HwDataByte, temp;
-volatile uint8_t 	ps2Buffer[buffersize];
-volatile uint8_t	read;
-volatile uint8_t	write;
-volatile uint8_t	ps2BufFlags = 0;
+struct ps2Buffer	*sendBuffer;
+struct ps2Buffer	*rcvBuffer;
 
-
-int8_t ps2_buffer_write(uint8_t data){
-	if((write==read)&&(!(ps2BufFlags&PS2_BUFFER_EMPTY))){//buffer full
-		ps2BufFlags = PS2_BUFFER_FULL;
+int8_t ps2_buffer_write(uint8_t data, ps2Buffer *buf){
+	if((buf->write==buf->read) && (!(buf->ps2BufFlags & PS2_BUFFER_EMPTY))){//buffer full
+		buf->ps2BufFlags = PS2_BUFFER_FULL;
 		return -1;
 	}
-	ps2Buffer[write] = data;
-	write++;
-	ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
-	if(write == size){
-		write = 0;
+	buf->buffer[buf->write] = data;
+	buf->write++;
+	buf->ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
+	if(buf->write == PS2_BUFFER_SIZE){
+		buf->write = 0;
 	}
 	return 0;
 }
 
-int8_t ps2_buffer_read(uint8_t *x){
+int8_t ps2_buffer_read(uint8_t *x, ps2Buffer *buf){
 
-	if(read == write)&&(!(ps2BufFlags&PS2_BUFFER_FULL)){ //buffer empty
-		ps2BufFlags = PS2_BUFFER_EMPTY;
+	if(buf->read == buf->write) && (!(buf->s2BufFlags & PS2_BUFFER_FULL)){ //buffer empty
+		buf->ps2BufFlags = PS2_BUFFER_EMPTY;
 		return -1;
 	}
-	(*x) = ps2[read];
-	read++;
-	ps2BufFlags &= ~(PS2_BUFFER_FULL)
+	(*x) = buf->buffer[buf->read];
+	buf->read++;
+	buf->ps2BufFlags &= ~(PS2_BUFFER_FULL)
 	
-	if(read == size){
-			read = 0;
+	if(buf->read == PS2_BUFFER_SIZE){
+			buf->read = 0;
 	}
 	return 0;
 }
