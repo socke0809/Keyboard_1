@@ -25,6 +25,7 @@
 
 #define PS2_BUFFER_SIZE		16
 
+
 void ps2_hw_init( void );
 
 uint8_t ps2_hw_get_flags( void );

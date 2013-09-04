@@ -23,8 +23,9 @@ enum ps2HwState    	state = start;
 volatile uint8_t	ps2HwFlags = 0;
 volatile uint8_t	ps2HwDataByte;
 volatile uint8_t	temp;
-struct ps2Buffer	*sendBuffer;
-struct ps2Buffer	*rcvBuffer;
+
+struct ps2Buffer	sendBuffer;
+struct ps2Buffer	rcvBuffer;
 
 int8_t ps2_buffer_write(uint8_t data, struct ps2Buffer *buf){
 	if((buf->write==buf->read) && (!(buf->ps2BufFlags & PS2_BUFFER_EMPTY))){//buffer full
@@ -91,7 +92,7 @@ void ps2_hw_init( void ){
 void ps2_hw_send_byte(uint8_t data){
 
     ps2HwFlags 	= PS2_HW_FLAG_SENDING;
-    ps2_buffer_write(data, sendBuffer);
+    int8_t write = ps2_buffer_write(data, &sendBuffer);
     
 
     EIMSK &= ~(0x01);						
@@ -114,17 +115,22 @@ void ps2_hw_send_byte(uint8_t data){
 int8_t ps2_hw_receive_byte(uint8_t *data){
     if(ps2HwFlags & PS2_HW_FLAG_RCV_COMPLETE){
         ps2HwFlags &= ~PS2_HW_FLAG_RCV_COMPLETE;
-       ps2_buffer_read(data, rcvBuffer);
-		
+		int8_t temp1 = ps2_buffer_read(data, &rcvBuffer);
 		if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
-            return 0;
-        }
-        else{
+			if(temp1 == 0){
+				return 0;
+			}
+			else{
             return -2;
+			}
         }
-    }else{
-        return -1;
-    }
+		else{
+			return -1;
+		}
+	}
+	else{
+	return -3;
+	}
 }
 
 
