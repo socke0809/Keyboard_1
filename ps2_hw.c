@@ -93,22 +93,6 @@ void ps2_hw_send_byte(uint8_t data){
 
     ps2HwFlags 	= PS2_HW_FLAG_SENDING;
     int8_t write = ps2_buffer_write(data, &sendBuffer);
-    
-
-    EIMSK &= ~(0x01);						
-        PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
-        PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);	//sets clk low
-
-        _delay_us( 150 );
-
-        PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);
-        PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
-
-        PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
-        PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
-    EIMSK |= 0x01;
-
-    state = data;
 }
 
 
@@ -137,7 +121,7 @@ int8_t ps2_hw_receive_byte(uint8_t *data){
 
 ISR( INT0_vect )
 {
-    if(!(ps2HwFlags & PS2_HW_FLAG_SENDING)){
+    if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
 
         switch(state){
             case start:
@@ -162,11 +146,14 @@ ISR( INT0_vect )
 
 
             case stop:
-                if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0){	// prüft stopbit = 1
+				temp  = ps2_buffer_write(ps2HwDataByte, &rcvBuffer);
+                if(((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0)||(temp!=0)){	// prüft stopbit = 1
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
 
                 }
+				
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
+				
                 state 	=	start;
                 break;
 
@@ -184,6 +171,22 @@ ISR( INT0_vect )
     }else{
         switch(state){
             case start:
+				ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+				temp = ps2HwDataByte;
+				EIMSK &= ~(0x01);						
+					PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
+					PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);	//sets clk low
+
+					_delay_us( 150 );
+
+					PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);
+					PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
+
+					PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
+					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
+				EIMSK |= 0x01;
+				state = data;
+
                 break;
 
 
