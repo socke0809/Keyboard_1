@@ -23,6 +23,7 @@ enum ps2HwState    	state = start;
 volatile uint8_t	ps2HwFlags = 0;
 volatile uint8_t	ps2HwDataByte;
 volatile uint8_t	temp;
+volatile uint8_t	empty = 0;
 
 struct ps2Buffer	sendBuffer;
 struct ps2Buffer	rcvBuffer;
@@ -91,16 +92,13 @@ void ps2_hw_init( void ){
 
 void ps2_hw_send_byte(uint8_t data){
 
-    ps2HwFlags 	= PS2_HW_FLAG_SENDING;
-    int8_t write = ps2_buffer_write(data, &sendBuffer);
+    return ps2_buffer_write(data, &sendBuffer);
 }
 
 
 int8_t ps2_hw_receive_byte(uint8_t *data){
-    if(ps2HwFlags & PS2_HW_FLAG_RCV_COMPLETE){
-        ps2HwFlags &= ~PS2_HW_FLAG_RCV_COMPLETE;
-		int8_t temp1 = ps2_buffer_read(data, &rcvBuffer);
-		if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
+		return ps2_buffer_read(data, &rcvBuffer);
+		/*if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
 			if(temp1 == 0){
 				return 0;
 			}
@@ -114,7 +112,7 @@ int8_t ps2_hw_receive_byte(uint8_t *data){
 	}
 	else{
 	return -3;
-	}
+	}*/
 }
 
 
@@ -136,12 +134,13 @@ ISR( INT0_vect )
                 if(
 				((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
 				){
-                    ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
+                    ps2HwDataByte = 0;
+					state = start;
 				}
                 else{
-                    ps2HwFlags  &=~ PS2_HW_FLAG_ERROR;
+                    state	=	stop;
                 }
-                state	=	stop;
+               
                 break;
 
 
@@ -172,6 +171,10 @@ ISR( INT0_vect )
         switch(state){
             case start:
 				ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+				if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
+					empty = 1;
+					sendBuffer.ps2BufFlags &=~ PS2_BUFFER_EMPTY;
+				}
 				temp = ps2HwDataByte;
 				EIMSK &= ~(0x01);						
 					PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
@@ -216,6 +219,10 @@ ISR( INT0_vect )
                 }
                 ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
+				
+				if( empty == 1){
+					sendBuffer->ps2BufFlags |= PS2_BUFFER_EMPTY;
+				}
                 state = start;
                 break;
 
