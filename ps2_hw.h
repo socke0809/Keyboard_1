@@ -8,6 +8,8 @@
 #define PS2_HW_FLAG_TRANSF_COMPLETE 	(1<<1)
 #define PS2_HW_FLAG_ERROR				(1<<3)
 #define PS2_HW_FLAG_SENDING	    		(1<<4)
+#define PS2_HW_FLAG_RECEIVING	    	(1<<5)
+
 
 
 #define PS2_HW_DATA        PD3
@@ -20,23 +22,19 @@
 #define PS2_HW_CLK_DDR     DDRD
 #define PS2_HW_CLK_PORT    PORTD
 
-#define PS2_RCV_BUFFER_EMPTY 	(1<<0)
-#define PS2_RCV_BUFFER_FULL	 	(1<<1)
-#define PS2_SEND_BUFFER_EMPTY 	(1<<2)
-#define PS2_SEND_BUFFER_FULL	(1<<3)
-#define PS2_SEND_BUFFER			(1<<4)
-#define PS2_RCV_BUFFER			(1<<5)
+#define PS2_BUFFER_EMPTY (1<<0)
+#define PS2_BUFFER_FULL	 (1<<1)
 
-#define SEND_BUF_SIZE  16
-#define RCV_BUF_SIZE  16
+#define PS2_BUFFER_SIZE		16
+
 
 void ps2_hw_init( void );
 
 uint8_t ps2_hw_get_flags( void );
 
-void ps2_hw_send_byte(uint8_t x);
+int8_t ps2_hw_send_byte( uint8_t data);
 
-int8_t ps2_hw_receive_byte(uint8_t *x);
+int8_t ps2_hw_receive_byte(uint8_t *data);
 
 
 

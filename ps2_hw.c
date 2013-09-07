@@ -12,80 +12,50 @@ enum ps2HwState {
     acknowledge	= 	11
 };
 
+struct ps2Buffer{
+	uint8_t buffer[PS2_BUFFER_SIZE];
+	uint8_t	read;
+	uint8_t	write;
+	uint8_t	ps2BufFlags;
+};
+	
+enum ps2HwState    	state = start;
+volatile uint8_t	ps2HwFlags = 0;
+volatile uint8_t	ps2HwDataByte;
+volatile uint8_t	temp;
 
-enum ps2HwState    	state    = start;
-volatile uint8_t	ps2HwFlags  = 0;
-volatile uint8_t	ps2HwDataByte, temp;
-volatile uint8_t 	ps2RcvBuffer[RCV_BUF_SIZE];
-volatile uint8_t 	ps2SendBuffer[SEND_BUF_SIZE];
-volatile uint8_t	rcvBufRead;
-volatile uint8_t	sendBufRead;
-volatile uint8_t	rcvBufWrite;
-volatile uint8_t	sendBufWrite;
-volatile uint8_t	ps2BufFlags = 0;
+struct ps2Buffer	sendBuffer;
+struct ps2Buffer	rcvBuffer;
 
-
-
-int8_t ps2_buffer_write(uint8_t data, uint8_t ps2BufFlags){
-	if(ps2BufFlags | PS2_SEND_BUFFER){
-		if((sendBufWrite==sendBufRead)&&(!(ps2BufFlags&PS2_SEND_BUFFER_EMPTY))){//buffer full
-			ps2BufFlags = PS2_SEND_BUFFER_FULL;
-			return -1;
-		}
-		ps2SendBuffer[sendBufWrite] = data;
-		sendBufWrite++;
-		ps2BufFlags &= ~(PS2_SEND_BUFFER_EMPTY);
-		if(sendBufWrite == SEND_BUF_SIZE){
-			sendBufWrite = 0;
-		}
-		return 0;
+int8_t ps2_buffer_write(uint8_t data, struct ps2Buffer *buf){
+	if((buf->write==buf->read) && (!(buf->ps2BufFlags & PS2_BUFFER_EMPTY))){//buffer full
+		buf->ps2BufFlags = PS2_BUFFER_FULL;
+		return -1;
 	}
-	else{
-		if((rcvBufWrite==rcvBufRead)&&(!(ps2BufFlags&PS2_RCV_BUFFER_EMPTY))){//buffer full
-			ps2BufFlags = PS2_RCV_BUFFER_FULL;
-			return -1;
-		}
-		ps2RcvBuffer[rcvBufWrite] = data;
-		rcvBufWrite++;
-		ps2BufFlags &= ~(PS2_RCV_BUFFER_EMPTY);
-		if(rcvBufWrite == RCV_BUF_SIZE){
-			rcvBufWrite = 0;
-		}
-		return 0;
-	}	
+	buf->buffer[buf->write] = data;
+	buf->write++;
+	buf->ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
+	if(buf->write == PS2_BUFFER_SIZE){
+		buf->write = 0;
+	}
+    return 0;
 }
 
-int8_t ps2_buffer_read(uint8_t *x, uint8_t ps2BuffFlags){
-	if(ps2BufFlags | PS2_SEND_BUFFER){
-		if((sendBufRead == sendBufWrite) && (!(ps2BufFlags&PS2_SEND_BUFFER_FULL))){ //buffer empty
-			ps2BufFlags = PS2_SEND_BUFFER_EMPTY;
-			return -1;
-		}
-		(*x) = ps2SendBuffer[sendBufRead];
-		sendBufRead++;
-		ps2BufFlags &= ~(PS2_SEND_BUFFER_FULL);
-	
-		if(sendBufRead == SEND_BUF_SIZE){
-			sendBufRead = 0;
-		}
-		return 0;
+int8_t ps2_buffer_read(uint8_t *data, struct ps2Buffer *buf){
+	if((buf->read == buf->write) && (!(buf->ps2BufFlags & PS2_BUFFER_FULL))){ //buffer empty
+		buf->ps2BufFlags = PS2_BUFFER_EMPTY;
+		return -1;
 	}
-	else{
-		if((rcvBufRead == rcvBufWrite) && (!(ps2BufFlags&PS2_RCV_BUFFER_FULL))){ //buffer empty
-			ps2BufFlags = PS2_RCV_BUFFER_EMPTY;
-			return -1;
-		}
-		(*x) = ps2RcvBuffer[rcvBufRead];
-		rcvBufRead++;
-		ps2BufFlags &= ~(PS2_RCV_BUFFER_FULL);
+	(*data) = buf->buffer[buf->read];
+	buf->read++;
+	buf->ps2BufFlags &= ~(PS2_BUFFER_FULL);
 	
-		if(rcvBufRead == RCV_BUF_SIZE){
-			rcvBufRead = 0;
-		}
-		return 0;
-	}		
+	if(buf->read == PS2_BUFFER_SIZE){
+			buf->read = 0;
+	}
+    return 0;
 }
-		
+	
 
 
 uint8_t parity_control(uint8_t x){
@@ -125,59 +95,70 @@ void ps2_hw_init( void ){
 
 
 
-uint8_t ps2_send_byte(uint8_t data){
-	ps2BufFlags |= PS2_SEND_BUFFER;
-    ps2_buffer_write(data, ps2BufFlags);
+int8_t ps2_hw_send_byte(uint8_t data){
+
+    return ps2_buffer_write(data, &sendBuffer);
 }
 
 
-
-int8_t ps2_receive_byte(uint8_t *x){
-	ps2BufFlags |= PS2_RCV_BUFFER;
-    if(ps2HwFlags & PS2_HW_FLAG_RCV_COMPLETE){
-       if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
-            ps2_buffer_read(x, ps2BufFlags);
+int8_t ps2_hw_receive_byte(uint8_t *data){
+		return ps2_buffer_read(data, &rcvBuffer);
+		/*if(!(ps2HwFlags & PS2_HW_FLAG_ERROR)){
+			if(temp1 == 0){
+				return 0;
+			}
+			else{
+            return -2;
+			}
+        }
+		else{
+			return -1;
 		}
 	}
-    else{
-            return -2;
-    }
-    
+	else{
+	return -3;
+	}*/
 }
 
 
 
 ISR( INT0_vect )
 {
-    if((!(ps2BufFlags & PS2_SEND_BUFFER_EMPTY)) && (state == start)){
+    if((!(ps2HwFlags&PS2_HW_FLAG_SENDING)||(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY))||(ps2HwFlags | PS2_HW_FLAG_RECEIVING)){
 
         switch(state){
             case start:
+				
                 if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0){	// überprüft startbit = 0 
                     state 		=	data;
                     ps2HwDataByte	=	0;
+					ps2HwFlags |= PS2_HW_FLAG_RECEIVING;
                 }
                 break;
 
 
             case parity:
                 if(
-				((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
+				    ( (PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) &&  parity_control(ps2HwDataByte)) ||
+                    (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
 				){
-                    ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
+                    ps2HwDataByte = 0;
+					state = start;
 				}
                 else{
-                    ps2HwFlags  &=~ PS2_HW_FLAG_ERROR;
+                    state	=	stop;
                 }
-                state	=	stop;
+               
                 break;
 
 
             case stop:
-                if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0){	// prüft stopbit = 1
+				temp  = ps2_buffer_write(ps2HwDataByte, &rcvBuffer);
+                if(((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0)||(temp!=0)){	// prüft stopbit = 1
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
 
                 }
+				ps2HwFlags &= ~PS2_HW_FLAG_RECEIVING;
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
                 state 	=	start;
 				ps2_buffer_write(ps2HwDataByte, ps2BufFlags);
@@ -198,6 +179,14 @@ ISR( INT0_vect )
     }else{
         switch(state){
             case start:
+				ps2HwFlags |= PS2_HW_FLAG_SENDING;
+				ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+				/*if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
+					empty = 1;
+					sendBuffer.ps2BufFlags &=~ PS2_BUFFER_EMPTY;
+				}*/
+				temp = ps2HwDataByte;
+
 				EIMSK &= ~(0x01);						
 					PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
 					PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);	//sets clk low
@@ -211,9 +200,6 @@ ISR( INT0_vect )
 					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
 				EIMSK |= 0x01;
 				state = data;
-				
-				 ps2_buffer_read(&ps2HwDataByte, ps2BufFlags);
-				 uint8_t temp = ps2HwDataByte; 
 
                 break;
 
@@ -244,9 +230,8 @@ ISR( INT0_vect )
                 }
                 ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
-				if((sendBufRead == sendBufWrite) && (!(ps2BufFlags & PS2_SEND_BUFFER_FULL))){ //buffer empty
-					ps2BufFlags = PS2_SEND_BUFFER_EMPTY;
-				}
+				
+				
                 state = start;
                 break;
 
