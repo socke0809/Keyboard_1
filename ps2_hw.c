@@ -38,7 +38,7 @@ int8_t ps2_buffer_write(uint8_t data, struct ps2Buffer *buf){
 	if(buf->write == PS2_BUFFER_SIZE){
 		buf->write = 0;
 	}
-    return 0;
+	return 0;
 }
 
 int8_t ps2_buffer_read(uint8_t *data, struct ps2Buffer *buf){
@@ -53,7 +53,7 @@ int8_t ps2_buffer_read(uint8_t *data, struct ps2Buffer *buf){
 	if(buf->read == PS2_BUFFER_SIZE){
 			buf->read = 0;
 	}
-    return 0;
+	return 0;
 }
 	
 
@@ -73,6 +73,7 @@ uint8_t ps2_hw_get_flags( void ){
 }
 
 
+
 void ps2_hw_init( void ){
     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);
     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
@@ -84,13 +85,6 @@ void ps2_hw_init( void ){
     //enable interrupt
     EICRA |= 0x02; //TODO
     EIMSK |= 0x01; //TODO
-	
-	sendBufRead 	= 0;
-	sendBufWrite	= 0;
-	rcvBufRead 		= 0;
-	rcvBufWrite 	= 0;
-	ps2BufFlags 	= PS2_SEND_BUFFER_EMPTY;	
-	ps2BufFlags 	|= PS2_RCV_BUFFER_EMPTY;
 }
 
 
@@ -161,8 +155,6 @@ ISR( INT0_vect )
 				ps2HwFlags &= ~PS2_HW_FLAG_RECEIVING;
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
                 state 	=	start;
-				ps2_buffer_write(ps2HwDataByte, ps2BufFlags);
-				
                 break;
 
 
@@ -186,7 +178,6 @@ ISR( INT0_vect )
 					sendBuffer.ps2BufFlags &=~ PS2_BUFFER_EMPTY;
 				}*/
 				temp = ps2HwDataByte;
-
 				EIMSK &= ~(0x01);						
 					PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
 					PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);	//sets clk low
