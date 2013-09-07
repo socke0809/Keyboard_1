@@ -8,6 +8,8 @@
 #define PS2_HW_FLAG_TRANSF_COMPLETE 	(1<<1)
 #define PS2_HW_FLAG_ERROR				(1<<3)
 #define PS2_HW_FLAG_SENDING	    		(1<<4)
+#define PS2_HW_FLAG_RECEIVING	    	(1<<5)
+
 
 
 #define PS2_HW_DATA        PD3
@@ -30,7 +32,7 @@ void ps2_hw_init( void );
 
 uint8_t ps2_hw_get_flags( void );
 
-void ps2_hw_send_byte( uint8_t data);
+int8_t ps2_hw_send_byte( uint8_t data);
 
 int8_t ps2_hw_receive_byte(uint8_t *data);
 

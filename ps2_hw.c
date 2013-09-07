@@ -23,7 +23,6 @@ enum ps2HwState    	state = start;
 volatile uint8_t	ps2HwFlags = 0;
 volatile uint8_t	ps2HwDataByte;
 volatile uint8_t	temp;
-volatile uint8_t	empty = 0;
 
 struct ps2Buffer	sendBuffer;
 struct ps2Buffer	rcvBuffer;
@@ -90,7 +89,7 @@ void ps2_hw_init( void ){
 
 
 
-void ps2_hw_send_byte(uint8_t data){
+int8_t ps2_hw_send_byte(uint8_t data){
 
     return ps2_buffer_write(data, &sendBuffer);
 }
@@ -119,13 +118,15 @@ int8_t ps2_hw_receive_byte(uint8_t *data){
 
 ISR( INT0_vect )
 {
-    if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
+    if((!(ps2HwFlags&PS2_HW_FLAG_SENDING)||(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY))||(ps2HwFlags | PS2_HW_FLAG_RECEIVING)){
 
         switch(state){
             case start:
+				
                 if((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) == 0){	// überprüft startbit = 0 
                     state 		=	data;
                     ps2HwDataByte	=	0;
+					ps2HwFlags |= PS2_HW_FLAG_RECEIVING;
                 }
                 break;
 
@@ -150,9 +151,8 @@ ISR( INT0_vect )
                     ps2HwFlags	|=	PS2_HW_FLAG_ERROR;
 
                 }
-				
+				ps2HwFlags &= ~PS2_HW_FLAG_RECEIVING;
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
-				
                 state 	=	start;
                 break;
 
@@ -170,11 +170,12 @@ ISR( INT0_vect )
     }else{
         switch(state){
             case start:
+				ps2HwFlags |= PS2_HW_FLAG_SENDING;
 				ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
-				if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
+				/*if(sendBuffer.ps2BufFlags | PS2_BUFFER_EMPTY){
 					empty = 1;
 					sendBuffer.ps2BufFlags &=~ PS2_BUFFER_EMPTY;
-				}
+				}*/
 				temp = ps2HwDataByte;
 				EIMSK &= ~(0x01);						
 					PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);		//sets clk as output
@@ -220,9 +221,7 @@ ISR( INT0_vect )
                 ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
 				
-				if( empty == 1){
-					sendBuffer->ps2BufFlags |= PS2_BUFFER_EMPTY;
-				}
+				
                 state = start;
                 break;
 
