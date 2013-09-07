@@ -133,7 +133,8 @@ ISR( INT0_vect )
 
             case parity:
                 if(
-				((PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && parity_control(ps2HwDataByte)) || (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
+				    ( (PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) &&  parity_control(ps2HwDataByte)) ||
+                    (!(PS2_HW_DATA_PIN & (1<<PS2_HW_DATA)) && !parity_control(ps2HwDataByte))
 				){
                     ps2HwDataByte = 0;
 					state = start;
