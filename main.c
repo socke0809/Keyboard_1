@@ -12,9 +12,11 @@ int main( void )
 	
 	ps2_hw_init();
 
+	_delay_ms(1000); //dbg
+	
 	sei();
 	
-	_delay_ms(1000); //dbg
+	
 
 
     uart_send_string("---");// WELCOME TO PS2 CONTROLLER ---\n");
