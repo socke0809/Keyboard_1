@@ -28,11 +28,23 @@
 #define PS2_BUFFER_SIZE		16
 
 
+
+struct ps2Buffer{
+    uint8_t buffer[PS2_BUFFER_SIZE];
+
+    uint8_t	read;
+    uint8_t	write;
+    uint8_t	ps2BufFlags;
+};
+
+
+
+
 void ps2_hw_init( void );
 
 uint8_t ps2_hw_get_flags( void );
 
-uint8_t ps2_get_buf_flags(void);
+uint8_t ps2_get_buf_flags(struct ps2Buffer *buf);
 
 int8_t ps2_hw_send_byte( uint8_t data);
 
