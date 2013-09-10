@@ -29,10 +29,11 @@ volatile struct ps2Buffer	sendBuffer;
 volatile struct ps2Buffer	rcvBuffer;
 
 int8_t ps2_buffer_write(uint8_t data, struct ps2Buffer *buf){
+    uint8_t SREGb = SREG;
+    SREG &= ~0x80;
 	if((buf->write==buf->read) && (!(buf->ps2BufFlags & PS2_BUFFER_EMPTY))){//buffer full
-		isrBit = 1;
 		buf->ps2BufFlags = PS2_BUFFER_FULL;
-		isrBit = 0;
+        SREG = SREGb;
 		return -1;
 	}
 	buf->buffer[buf->write] = data;
@@ -41,14 +42,16 @@ int8_t ps2_buffer_write(uint8_t data, struct ps2Buffer *buf){
 	if(buf->write == PS2_BUFFER_SIZE){
 		buf->write = 0;
 	}
+    SREG = SREGb;
 	return 0;
 }
 
 int8_t ps2_buffer_read(uint8_t *data, struct ps2Buffer *buf){
+    uint8_t SREGb = SREG;
+    SREG &= ~0x80;
 	if((buf->read == buf->write) && (!(buf->ps2BufFlags & PS2_BUFFER_FULL))){ //buffer empty
-		isrBit = 1;
 		buf->ps2BufFlags = PS2_BUFFER_EMPTY;
-		isrBit = 0;
+        SREG = SREGb;
 		return -1;
 	}
 	(*data) = buf->buffer[buf->read];
@@ -58,6 +61,7 @@ int8_t ps2_buffer_read(uint8_t *data, struct ps2Buffer *buf){
 	if(buf->read == PS2_BUFFER_SIZE){
 			buf->read = 0;
 	}
+    SREG = SREGb;
 	return 0;
 }
 	
