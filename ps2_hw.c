@@ -180,11 +180,11 @@ ISR( INT0_vect )
                 ps2HwFlags	|=	PS2_HW_FLAG_RCV_COMPLETE;
                 state 	=	start;
                 if(!(sendBuffer.ps2BufFlags & PS2_BUFFER_EMPTY )){
+				   _delay_us(500);
                   PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);//clk as output
                   PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);//clk low
                   _delay_us(150);
                   PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
-				   _delay_us(500);
                   PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 				 
                   }
@@ -245,11 +245,11 @@ ISR( INT0_vect )
                 ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
                 if(!(sendBuffer.ps2BufFlags & PS2_BUFFER_EMPTY)){
+                    _delay_us(500);
                     PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);//clk as output
                     PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);//clk low
                     _delay_us(150);
                     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
-					 _delay_us(500);
                     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
                 }
 
