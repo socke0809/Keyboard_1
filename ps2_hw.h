@@ -32,9 +32,9 @@
 struct ps2Buffer{
     uint8_t buffer[PS2_BUFFER_SIZE];
 
-    uint8_t	read;
-    uint8_t	write;
-    uint8_t	ps2BufFlags;
+    volatile uint8_t	read;
+    volatile uint8_t	write;
+    volatile uint8_t	ps2BufFlags;
 };
 
 
