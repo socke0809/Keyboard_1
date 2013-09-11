@@ -7,8 +7,8 @@
 #define PS2_HW_FLAG_RCV_COMPLETE       	(1<<0)
 #define PS2_HW_FLAG_TRANSF_COMPLETE 	(1<<1)
 #define PS2_HW_FLAG_ERROR				(1<<3)
-#define PS2_HW_FLAG_SENDING	    		(1<<6)
-#define PS2_HW_FLAG_RECEIVING	    	(1<<7)
+#define PS2_HW_FLAG_SENDING	    		(1<<4)
+#define PS2_HW_FLAG_RECEIVING	    	(1<<5)
 
 
 
