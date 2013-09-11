@@ -127,12 +127,7 @@ int8_t ps2_hw_send_byte(uint8_t data){
         PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
         PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 				  
-		ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
-		ps2HwFlags |= PS2_HW_FLAG_SENDING;
-        temp = ps2HwDataByte;
-		state = data;
-				 
-    }
+		}
 
     return x;
 }
@@ -202,10 +197,10 @@ ISR( INT0_vect )
                   PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                   PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 				  
-				  ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
-				ps2HwFlags |= PS2_HW_FLAG_SENDING;
-                temp = ps2HwDataByte;
-				state = data;
+				  //ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+				//ps2HwFlags |= PS2_HW_FLAG_SENDING;
+                //temp = ps2HwDataByte;
+				//state = data;
 				 
                   }
 
@@ -272,9 +267,7 @@ ISR( INT0_vect )
                     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 					 ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
-				ps2HwFlags |= PS2_HW_FLAG_SENDING;
-                temp = ps2HwDataByte;
-				state = data;
+				
                 }
 
                 state = start;
