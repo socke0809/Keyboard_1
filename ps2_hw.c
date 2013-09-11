@@ -184,6 +184,9 @@ ISR( INT0_vect )
                   PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);//clk as output
                   PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);//clk low
                   _delay_us(150);
+				  PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
+				PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
+				  
                   PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                   PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 				 
@@ -210,8 +213,8 @@ ISR( INT0_vect )
                 ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
 				ps2HwFlags |= PS2_HW_FLAG_SENDING;
                 temp = ps2HwDataByte;
-                PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
-                PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
+                //PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
+                //PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                 //EIMSK |= 0x01;
                 state = data;
 
@@ -249,6 +252,8 @@ ISR( INT0_vect )
                     PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);//clk as output
                     PS2_HW_CLK_PORT &= ~(1<<PS2_HW_CLK);//clk low
                     _delay_us(150);
+					 PS2_HW_DATA_DDR |= (1<<PS2_HW_DATA); //sets data output
+					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
                 }
