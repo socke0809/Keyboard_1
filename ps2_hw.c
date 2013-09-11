@@ -266,7 +266,6 @@ ISR( INT0_vect )
 					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
-					 ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
 				
                 }
 
