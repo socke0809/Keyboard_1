@@ -15,10 +15,9 @@ enum ps2HwState {
 
 volatile enum ps2HwState    state = start;
 volatile uint8_t	        ps2HwFlags = 0;
-volatile uint8_t	        ps2HwDataByte;
+uint8_t	        			ps2HwDataByte;
 volatile uint8_t	        temp;
-volatile struct ps2Buffer	sendBuffer;
-volatile struct ps2Buffer	rcvBuffer;
+
 
 
 int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
@@ -197,10 +196,10 @@ ISR( INT0_vect )
                   PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                   PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
 				  
-				  //ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
-				//ps2HwFlags |= PS2_HW_FLAG_SENDING;
-                //temp = ps2HwDataByte;
-				//state = data;
+				 ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+				ps2HwFlags |= PS2_HW_FLAG_SENDING;
+                temp = ps2HwDataByte;
+				state = data;
 				 
                   }
 
@@ -257,6 +256,7 @@ ISR( INT0_vect )
                 }
                 ps2HwFlags  |= PS2_HW_FLAG_TRANSF_COMPLETE;
                 ps2HwFlags	&=	~(PS2_HW_FLAG_SENDING);
+				state = start;
                 if(!(sendBuffer.ps2BufFlags & PS2_BUFFER_EMPTY)){
                     _delay_us(500);
                     PS2_HW_CLK_DDR |= (1<<PS2_HW_CLK);//clk as output
@@ -266,10 +266,15 @@ ISR( INT0_vect )
 					PS2_HW_DATA_PORT &= ~(1<<PS2_HW_DATA);
                     PS2_HW_CLK_DDR &= ~(1<<PS2_HW_CLK);//clk as input
                     PS2_HW_CLK_PORT |= (1<<PS2_HW_CLK); //enable pullup
+					
+					 ps2_buffer_read(&ps2HwDataByte, &sendBuffer);
+					ps2HwFlags |= PS2_HW_FLAG_SENDING;
+					temp = ps2HwDataByte;
+					state = data;
 				
                 }
 
-                state = start;
+                //state = start;
                 break;
 
 

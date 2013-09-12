@@ -37,10 +37,16 @@ struct ps2Buffer{
     volatile uint8_t	ps2BufFlags;
 };
 
+volatile struct ps2Buffer	sendBuffer;
+volatile struct ps2Buffer	rcvBuffer;
 
 
 
 void ps2_hw_init( void );
+
+int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf);
+
+int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf);
 
 uint8_t ps2_hw_get_flags( void );
 
