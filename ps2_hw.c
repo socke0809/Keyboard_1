@@ -20,6 +20,8 @@ volatile uint8_t	        temp;
 
 
 
+uint8_t ps2_peek_buffer(volatile struct ps2Buffer *buf){
+
 int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     uint8_t SREGb = SREG;
     SREG &= ~0x80;
@@ -30,6 +32,7 @@ int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     }
     buf->buffer[buf->write] = data;
     buf->write++;
+	buf->keyCount++;
     buf->ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
     if(buf->write == PS2_BUFFER_SIZE){
         buf->write = 0;
@@ -42,6 +45,13 @@ int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     return 0;
 }
 
+uint8_t ps2_buffer_peek(volatile struct ps2Buffer *buf){
+	if(buf->ps2BufFlags& PS2_BUFFER_EMPTY){
+		return 0;
+	}
+	
+	return buf->buffer[buf->read];
+}
 
 int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf){
     uint8_t SREGb = SREG;
@@ -49,12 +59,13 @@ int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf){
     if((buf->read == buf->write) && (!(buf->ps2BufFlags & PS2_BUFFER_FULL))){ //buffer empty
         buf->ps2BufFlags = PS2_BUFFER_EMPTY;
         SREG = SREGb;
+		buf->keyCount = 0;
         return -1;
     }
     (*data) = buf->buffer[buf->read];
     buf->read++;
     buf->ps2BufFlags &= ~(PS2_BUFFER_FULL);
-
+	buf->keyCount--;
     if(buf->read == PS2_BUFFER_SIZE){
         buf->read = 0;
     }

@@ -43,13 +43,14 @@ int main( void )
 	
     while(1){
 	
-		uint8_t data;
-		int8_t ret;
+		//uint8_t data;
+		//int8_t ret;
 		char* keys; 
 		
 		keys = ps2_get_keys();
 		
 		uart_send_string(keys);
+		uart_send_byte('\r');
 		uart_send_byte( '\n');
 		
 		/*ret = ps2_hw_receive_byte(&data);

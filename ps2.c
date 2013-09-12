@@ -1,7 +1,7 @@
 #include "ps2.h"
 #include "ps2_hw.h"
 
-char ps2KeyArray[6];
+char ps2KeyArray[7];
 
 
 void ps2_init(void){
@@ -13,7 +13,7 @@ void ps2_init(void){
 
 char* ps2_get_keys(void){
 	uint8_t data;
-	char actKey;
+	char actKey = 0;
 
 	if(ps2_buffer_read(&data, &rcvBuffer) == 0){
 		switch(data){
@@ -53,12 +53,16 @@ char* ps2_get_keys(void){
 			case 0x3d: actKey = '7'; break;
 			case 0x3e: actKey = '8'; break;
 			case 0x46: actKey = '9'; break;
+			case 0xf0: ;   break;
+			
 			default: break;
 		}
 		for(uint8_t i = 0; i<6; i++){
 			if(ps2KeyArray[i] == actKey){
+			
 				break;
 			}
+			
 			if(ps2KeyArray[i] == 0){
 				ps2KeyArray[i] = actKey;
 				ps2KeyArray[i+1] = 0;

@@ -35,6 +35,7 @@ struct ps2Buffer{
     volatile uint8_t	read;
     volatile uint8_t	write;
     volatile uint8_t	ps2BufFlags;
+	uint8_t				keyCount;
 };
 
 volatile struct ps2Buffer	sendBuffer;
