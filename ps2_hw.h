@@ -35,7 +35,7 @@ struct ps2Buffer{
     volatile uint8_t	read;
     volatile uint8_t	write;
     volatile uint8_t	ps2BufFlags;
-	uint8_t				keyCount;
+	uint8_t				size;
 };
 
 volatile struct ps2Buffer	sendBuffer;
@@ -49,13 +49,18 @@ int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf);
 
 int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf);
 
+int8_t ps2_buffer_peek(uint8_t *data, volatile struct ps2Buffer *buf);
+
 uint8_t ps2_hw_get_flags( void );
 
 uint8_t ps2_get_buf_flags(struct ps2Buffer *buf);
 
+uint8_t ps2_get_rcv_buf_size(void);
+
 int8_t ps2_hw_send_byte( uint8_t data);
 
 int8_t ps2_hw_receive_byte(uint8_t *data);
+
 
 
 

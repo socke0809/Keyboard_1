@@ -20,7 +20,6 @@ volatile uint8_t	        temp;
 
 
 
-uint8_t ps2_peek_buffer(volatile struct ps2Buffer *buf){
 
 int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     uint8_t SREGb = SREG;
@@ -32,7 +31,7 @@ int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     }
     buf->buffer[buf->write] = data;
     buf->write++;
-	buf->keyCount++;
+	buf->size++;
     buf->ps2BufFlags &= ~(PS2_BUFFER_EMPTY);
     if(buf->write == PS2_BUFFER_SIZE){
         buf->write = 0;
@@ -45,13 +44,18 @@ int8_t ps2_buffer_write(uint8_t data, volatile struct ps2Buffer *buf){
     return 0;
 }
 
-uint8_t ps2_buffer_peek(volatile struct ps2Buffer *buf){
+int8_t ps2_buffer_peek(uint8_t *data, volatile struct ps2Buffer *buf){
 	if(buf->ps2BufFlags& PS2_BUFFER_EMPTY){
-		return 0;
+		return -1;
 	}
 	
-	return buf->buffer[buf->read];
+	(*data) =  buf->buffer[buf->read];
+	return 0;
 }
+
+void ps2_bufer_read++(volatile struct ps2Buffer *buf){
+
+
 
 int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf){
     uint8_t SREGb = SREG;
@@ -59,13 +63,13 @@ int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf){
     if((buf->read == buf->write) && (!(buf->ps2BufFlags & PS2_BUFFER_FULL))){ //buffer empty
         buf->ps2BufFlags = PS2_BUFFER_EMPTY;
         SREG = SREGb;
-		buf->keyCount = 0;
+		buf->size = 0;
         return -1;
     }
     (*data) = buf->buffer[buf->read];
     buf->read++;
     buf->ps2BufFlags &= ~(PS2_BUFFER_FULL);
-	buf->keyCount--;
+	buf->size--;
     if(buf->read == PS2_BUFFER_SIZE){
         buf->read = 0;
     }
@@ -99,6 +103,9 @@ uint8_t ps2_get_buf_flags(struct ps2Buffer *buf){
     return buf->ps2BufFlags;
 }
 
+uint8_t ps2_get_rcv_buf_size(){
+	return rcvBuffer.size;
+}
 
 
 void ps2_hw_init( void ){
@@ -115,6 +122,9 @@ void ps2_hw_init( void ){
     rcvBuffer.write = 0;
     sendBuffer.read = 0;
     sendBuffer.write = 0;
+	rcvBuffer.size = 0;
+    sendBuffer.size = 0;
+	
 
 
     //enable interrupt
