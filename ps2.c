@@ -2,7 +2,7 @@
 #include "ps2_hw.h"
 
 char ps2KeyArray[7];
-uint8_t breakCode = 0;
+
 
 void ps2_init(void){
 	ps2_hw_init();
@@ -12,19 +12,23 @@ void ps2_init(void){
 }
 
 char* ps2_get_keys(void){
+
 	uint8_t data;
 	char actKey = 0;
+	uint8_t breakCode = 0;
 	
 	if(ps2_buffer_peek(&data, &rcvBuffer) ==0){
 		if(data == 0xf0){
+			breakCode = 1;
 			if( ps2_get_rcv_buf_size()>=2){
-				rcvBuffer->read++;
-				rcvBuffer->size--;
+				ps2_buffer_read(&data, &rcvBuffer);
+				breakCode = 1;
 			}
 			else{
-			//TODO 
+			 return ps2KeyArray;
 			}
 		}
+	}
 		if(ps2_buffer_read(&data, &rcvBuffer) == 0){
 			switch(data){
 				case 0x1c: actKey = 'a'; break; 
@@ -66,30 +70,28 @@ char* ps2_get_keys(void){
 				default: break;
 		}
 		
-			for(uint8_t i = 0; i<6; i++){
-				if(ps2KeyArray[i] == 0){
-					ps2KeyArray[i] = actKey;
-					ps2KeyArray[i+1] = 0;
-				}
-				if(i>0){			
-					if(ps2KeyArray[i] == ps2KeyArray[i-1]){
-						ps2KeyArray[i] = 0;
-						ps2KeyArray[i-1] = 0;
-						break;
+		for(uint8_t i = 0; i<6; i++){
+			if(ps2KeyArray[i] == actKey){
+				if(breakCode == 1){
+					for(uint8_t j = i; j<6; j++){
+						if(ps2KeyArray[j] != 0){
+						ps2KeyArray[j] = ps2KeyArray[j+1];
+						}
 					}
-				
-					
-				}
+
 				break;
-				
 			}
-			
-			
+
+			if(ps2KeyArray[i] == 0){
+				ps2KeyArray[i] = actKey;
+				ps2KeyArray[i+1] = 0;
+				break;
+			}
 		}
 		
-		}
 		
+
 	}
-	
+
 	return ps2KeyArray;
 }
