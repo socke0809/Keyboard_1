@@ -53,8 +53,6 @@ int8_t ps2_buffer_peek(uint8_t *data, volatile struct ps2Buffer *buf){
 	return 0;
 }
 
-void ps2_bufer_read++(volatile struct ps2Buffer *buf){
-
 
 
 int8_t ps2_buffer_read(uint8_t *data, volatile struct ps2Buffer *buf){
@@ -101,10 +99,6 @@ uint8_t ps2_hw_get_flags( void ){
 
 uint8_t ps2_get_buf_flags(struct ps2Buffer *buf){
     return buf->ps2BufFlags;
-}
-
-uint8_t ps2_get_rcv_buf_size(){
-	return rcvBuffer.size;
 }
 
 

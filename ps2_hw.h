@@ -55,8 +55,6 @@ uint8_t ps2_hw_get_flags( void );
 
 uint8_t ps2_get_buf_flags(struct ps2Buffer *buf);
 
-uint8_t ps2_get_rcv_buf_size(void);
-
 int8_t ps2_hw_send_byte( uint8_t data);
 
 int8_t ps2_hw_receive_byte(uint8_t *data);
