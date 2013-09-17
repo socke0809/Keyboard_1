@@ -16,16 +16,43 @@ ISR (TIMER1_COMPA_vect){
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 }
 
-void set_OCR(char key){
+void set_OCR(char key1, char key2){
+	
 	uint16_t f_oc = 0;
-	switch(key){
-		case 'c': f_oc = 264; break;
-		case 'd': f_oc = 297; break;
-		case 'e': f_oc = 330; break;
-		case 'f': f_oc = 352; break;
-		case 'g': f_oc = 396; break;
-		case 'a': f_oc = 440; break;
-		case 'h': f_oc = 495; break;
+	switch(key1){
+		case '#':
+			switch(key2){
+			case 'c': f_oc = 277; break;
+			case 'd': f_oc = 311; break;
+			case 'g': f_oc = 370; break;
+			case 'a': f_oc = 415; break;
+			case 'h': f_oc = 466; break;
+			default: break;
+			
+			}
+			break;
+		case 'b':
+			switch(key2){
+			case 'd': f_oc = 277; break;
+			case 'e': f_oc = 311; break;
+			case 'f': f_oc = 370; break;
+			case 'g': f_oc = 415; break;
+			case 'a': f_oc = 466; break;
+			default: break;
+			}
+			break;
+		default:
+			switch(key2){
+			case 'c': f_oc = 264; break;
+			case 'd': f_oc = 297; break;
+			case 'e': f_oc = 330; break;
+			case 'f': f_oc = 352; break;
+			case 'g': f_oc = 396; break;
+			case 'a': f_oc = 440; break;
+			case 'h': f_oc = 495; break;
+			default: break;
+			}
+			break;
 	}
 	OCR1A = (16000000/(2*f_oc))-1;
 }
