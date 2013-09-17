@@ -98,3 +98,4 @@ char* ps2_get_keys(void){
 
 	return ps2KeyArray;
 }
+
