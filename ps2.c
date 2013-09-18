@@ -103,7 +103,7 @@ char* ps2_get_keys(void){
 
 
 
-char get_new_keys(void){
+char get_new_key(void){
 
 	uint8_t data;
 	char actKey = 0;
@@ -164,34 +164,14 @@ char get_new_keys(void){
 			default: break;
 		}
 		
-		for(uint8_t i = 0; i<6; i++){
-			if(ps2KeyArray[i] == actKey){
-				if(breakCode == 1){
-					return actKey;
-						}
-					
-				for(uint8_t j = i; j<6; j++){
-					ps2KeyArray[j] = ps2KeyArray[j+1];
-						}
-				
-			break;
-			
-		
-			
-	}
-
-			if(ps2KeyArray[i] == 0){
-				ps2KeyArray[i] = actKey;
-				ps2KeyArray[i+1] = 0;
-				break;
-			}
+		if(breakCode == 0){
+			return actKey;
 		}
-		
-		
-
 	}
+	
 	return 0;
 }
+	
 
 
 
