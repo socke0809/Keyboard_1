@@ -10,5 +10,8 @@ void ps2_init(void);
 
 char* ps2_get_keys(void);
 
+char ps2_get_new_keys(void);
+
+
 
 #endif

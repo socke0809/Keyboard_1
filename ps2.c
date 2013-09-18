@@ -2,7 +2,7 @@
 #include "ps2_hw.h"
 
 char ps2KeyArray[7];
-char ps2NewKeyArray[7];
+
 
 
 void ps2_init(void){
@@ -78,6 +78,7 @@ char* ps2_get_keys(void){
 		for(uint8_t i = 0; i<6; i++){
 			if(ps2KeyArray[i] == actKey){
 				if(breakCode == 1){
+					
 					for(uint8_t j = i; j<6; j++){
 						ps2KeyArray[j] = ps2KeyArray[j+1];
 						}
@@ -102,27 +103,25 @@ char* ps2_get_keys(void){
 
 
 
-char* get_new_keys(void){
+char get_new_keys(void){
 
 	uint8_t data;
 	char actKey = 0;
 	uint8_t breakCode = 0;
-	
-	
+
+
 	if(ps2_buffer_peek(&data, &rcvBuffer) ==0){
 		if(data == 0xf0){
 			breakCode = 1;
 			if( rcvBuffer.size >=2){
 				ps2_buffer_read(&data, &rcvBuffer);
 				breakCode = 1;
-			}
-			else{
-			 return ps2NewKeyArray;
+			}else{
+				return 0;
 			}
 		}
-	}
-	else{
-		return ps2NewKeyArray;
+	}else{
+		return 0;
 	}
 	if(ps2_buffer_read(&data, &rcvBuffer) == 0){
 		switch(data){
@@ -168,19 +167,18 @@ char* get_new_keys(void){
 		for(uint8_t i = 0; i<6; i++){
 			if(ps2KeyArray[i] == actKey){
 				if(breakCode == 1){
-					for(uint8_t k = 0; k<6; k++){
-						if(ps2NewKeyArray[k] == 0){
-							ps2NewKeyArray[k] = actKey;
-							ps2NewKeyArray[k+1] = 0;
-							break;
+					return actKey;
 						}
-					}
-					for(uint8_t j = i; j<6; j++){
-						ps2KeyArray[j] = ps2KeyArray[j+1];
+					
+				for(uint8_t j = i; j<6; j++){
+					ps2KeyArray[j] = ps2KeyArray[j+1];
 						}
-				}
-				break;
-			}
+				
+			break;
+			
+		
+			
+	}
 
 			if(ps2KeyArray[i] == 0){
 				ps2KeyArray[i] = actKey;
@@ -192,8 +190,11 @@ char* get_new_keys(void){
 		
 
 	}
-
-	return ps2NewKeyArray;
+	return 0;
 }
+
+
+
+
 
 

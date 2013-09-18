@@ -63,8 +63,8 @@ int main( void )
 			
 			uart_send_byte( 0xAA );
 			uart_send_byte( 0xAA );
-		}*/
-		
+		}
+		*/
 		_delay_ms(1);
 	
     }
