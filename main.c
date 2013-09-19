@@ -8,6 +8,7 @@
 
 int main( void )
 {
+	uint8_t count = 0;
     uart_init();
 	
 	ps2_init();
@@ -45,11 +46,16 @@ int main( void )
 	
 		//uint8_t data;
 		//int8_t ret;
-		char* keys; 
+		//char* keys; 
+		char* string;
+
 		
-		keys = ps2_get_keys();
-		
-		uart_send_string(keys);
+		//keys = ps2_get_keys();
+		for(uint8_t i = count; get_new_key() != 0; i++){
+			string[i] =  get_new_key();	
+			count++;
+		}
+		uart_send_string(string);
 		uart_send_byte('\r');
 		uart_send_byte( '\n');
 		
