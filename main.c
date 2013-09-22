@@ -51,8 +51,8 @@ int main( void )
 
 		
 		//keys = ps2_get_keys();
-		for(uint8_t i = count; get_new_key() != 0; i++){
-			string[i] =  get_new_key();	
+		while(get_new_key()!= 0){
+			string[count] = get_new_key();
 			count++;
 		}
 		uart_send_string(string);
