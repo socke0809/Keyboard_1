@@ -4,7 +4,7 @@
 
 #include "ps2.h"
 #include "uart.h"
-
+#include "sound.h"
 
 int main( void )
 {
@@ -12,6 +12,8 @@ int main( void )
     uart_init();
 	
 	ps2_init();
+	
+	sound_init();
 
 	_delay_ms(1000); //dbg
 	
@@ -40,21 +42,27 @@ int main( void )
 
 	uart_send_string("---");
 	
-	
+	char string[25]; 
+	for(uint8_t i = 0; i<25; i++){
+		string[i] = 0;
+	}
 	
     while(1){
 	
 		//uint8_t data;
 		//int8_t ret;
 		//char* keys; 
-		char* string;
+		char key = get_new_key();
+		
 
 		
 		//keys = ps2_get_keys();
-		while(get_new_key()!= 0){
-			string[count] = get_new_key();
+	
+		if(key!= 0 && count < 25){
+			string[count] = key;
 			count++;
 		}
+		
 		uart_send_string(string);
 		uart_send_byte('\r');
 		uart_send_byte( '\n');

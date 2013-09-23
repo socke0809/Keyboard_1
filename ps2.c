@@ -72,6 +72,7 @@ char* ps2_get_keys(void){
 			case 0x3d: actKey = '7'; break;
 			case 0x3e: actKey = '8'; break;
 			case 0x46: actKey = '9'; break;
+			case 0x5d: actKey = '#'; break;
 			default: break;
 		}
 		
@@ -161,7 +162,10 @@ char get_new_key(void){
 			case 0x3d: actKey = '7'; break;
 			case 0x3e: actKey = '8'; break;
 			case 0x46: actKey = '9'; break;
-			default: break;
+			case 0x5d: actKey = '#'; break;
+			
+			default: actKey = data;
+			break;
 		}
 		
 		if(breakCode == 0){

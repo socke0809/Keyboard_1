@@ -3,6 +3,11 @@
 
 
 #include "sound.h"
+#include "ps2.h"
+
+
+volatile uint16_t count_max;
+uint16_t count = 0;
 
 void sound_init(void){
 	TCCR1A	 = 	0;
@@ -15,9 +20,20 @@ void sound_init(void){
 
 ISR (TIMER1_COMPA_vect){
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
+	if(count == count_max){
+		count = 0;
+		//TODO parsen
+	}
+	count++;
+	
+}
+		
+		
+ 
 }
 
-void set_OCR(char key1, char key2){
+void set_OCR(char key1, char key2)
+{
 	
 	uint16_t f_oc = 0;
 	switch(key1){
@@ -56,4 +72,5 @@ void set_OCR(char key1, char key2){
 			break;
 	}
 	OCR1A = (16000000/(2*f_oc))-1;
+	count_max = (1000*SOUND_PERIOD*16000000)/((OCR1A + 1)*2);
 }
