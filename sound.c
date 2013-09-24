@@ -18,15 +18,39 @@ void sound_init(char strg[25]){
 	SOUND_SIGNAL_DDR |= (1<<SOUND_SIGNAL); //sets sound_signal as output
 	for(uint8_t i = 0; i < 25; i++){
 		string[i] = strg[i];
-	]
+	}
 }
 
 ISR (TIMER1_COMPA_vect){
 static uint16_t count = 0;
+char key1, key2;
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 	if(count == count_max){
 		count = 0;
-		//TODO parsen
+		if(string[0] != '/0'){
+			if(string[1] == ' '){
+				key2 = string[0];
+				key1 = 'x';
+				for(uint8_t i = 0; i < 25; i++){
+					if(i<23){
+					string[i] = string[i+2];
+					}else{
+					string[i] = '/0';
+					}
+				}
+			}else{
+				key1 = string[0];
+				key2 = string[1];
+				for(uint8_t i = 0; i < 25; i++){
+					if(i<22){
+					string[i] = string[i+3];
+					}else{
+					string[i] = '/0';
+					}
+				}
+			}
+			set_OCR(key1, key2);
+		}
 	}
 	count++;
 	
