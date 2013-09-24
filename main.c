@@ -13,7 +13,7 @@ int main( void )
 	
 	ps2_init();
 	
-	sound_init();
+	
 
 	_delay_ms(1000); //dbg
 	
@@ -37,7 +37,7 @@ int main( void )
 	//while(!(ps2_hw_get_flags()&PS2_HW_FLAG_TRANSF_COMPLETE));
 	_delay_ms(100);
 */
-
+	
 
 
 	uart_send_string("---");
@@ -46,7 +46,7 @@ int main( void )
 	for(uint8_t i = 0; i<25; i++){
 		string[i] = 0;
 	}
-	
+	sound_init(string);
     while(1){
 	
 		//uint8_t data;

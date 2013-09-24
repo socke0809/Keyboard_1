@@ -7,15 +7,18 @@
 
 
 volatile uint16_t count_max;
+volatile char string[25];
 
 
-void sound_init(void){
+void sound_init(char strg[25]){
 	TCCR1A	 = 	0;
 	TCCR1B 	|= 	(1<<CS10) | (1<<WGM12); //sets prescaler 1
 	OCR1A	 = 	30000;	//timer stops counting at 30000
 	TIMSK1 	|= 			(1<<OCIE1A); //enables interrupt
 	SOUND_SIGNAL_DDR |= (1<<SOUND_SIGNAL); //sets sound_signal as output
-	
+	for(uint8_t i = 0; i < 25; i++){
+		string[i] = strg[i];
+	]
 }
 
 ISR (TIMER1_COMPA_vect){
