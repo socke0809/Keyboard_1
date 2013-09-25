@@ -28,7 +28,7 @@ void sound_init(char *strg){
 ISR (TIMER1_COMPA_vect){
 static uint16_t count = 0;
 uint8_t end_of_note = 0;
-char key1, key2;
+char key1, key2, key3;
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 	if(count == count_max){
 		count = 0;
@@ -54,6 +54,18 @@ char key1, key2;
 				key2 =string[key_count];
 				key_count++;
 				break;
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				key3 = string[key_count];
+				key_count++;
+				break;
 			case ' ': 
 				set_OCR(key1, key2);
 				key_count++;
@@ -64,16 +76,13 @@ char key1, key2;
 		}
 	}
 	count++;
-	
 }
-		
-		
- 
 
 
-void set_OCR(char key1, char key2)
+
+void set_OCR(char key1, char key2, char key 3)
 {
-	
+	uint8_t x = 1;
 	uint16_t f_oc = 0;
 	switch(key1){
 		case '#':
@@ -110,6 +119,19 @@ void set_OCR(char key1, char key2)
 			}
 			break;
 	}
+	switch(key3){
+			case '1': x = 1; break;
+			case '2': x = 2; break;
+			case '3': x = 3; break;
+			case '4': x = 4; break;
+			case '5': x = 5; break;
+			case '6': x = 6; break;
+			case '7': x = 7; break;
+			case '8': x = 8; break;
+			case '9': x = 9; break;
+			default: break;
+			}
+		
 	OCR1A = (16000000/(2*f_oc))-1;
-	count_max = (2*f_oc*SOUND_PERIOD)/1000;
+	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*x)/1000;
 }

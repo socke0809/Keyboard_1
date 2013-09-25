@@ -60,6 +60,10 @@ int main( void )
 		while(key!=0x76){
 			 key = get_new_key();
 		}
+		for(uint8_t i = 0; i<count; i++){
+			string[i] = 0;
+		}
+		count = 0;
 	}	
 
 	if(key!= 0 && count < 25){
