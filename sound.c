@@ -11,6 +11,7 @@ volatile char string[25];
 volatile uint8_t key_count;
 
 
+
 void sound_init(char strg[25]){
 	TCCR1A	 = 	0;
 	TCCR1B 	|= 	(1<<CS10) | (1<<WGM12); //sets prescaler 1
@@ -20,16 +21,24 @@ void sound_init(char strg[25]){
 	for(uint8_t i = 0; i < 25; i++){
 		string[i] = strg[i];
 	}
-}	key_count = 0;
-
+	key_count = 0;
+}
+	
+	
 ISR (TIMER1_COMPA_vect){
 static uint16_t count = 0;
+static uint8_t end_of_note = 0;
 char key1, key2;
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 	if(count == count_max){
 		count = 0;
+		while(end_of_note == 0){
 		switch(string[key_count]){
-			case \0: TIMSK1 &= 	~(1<<OCIE1A); break;
+			case '\0': 
+				TIMSK1 &= 	~(1<<OCIE1A);
+				key_count = 0;
+				end_of_note = 1;
+				break;
 			case '#': 
 			case 'b': 
 				key1 = string[key_count];
@@ -45,8 +54,13 @@ char key1, key2;
 				key2 =string[key_count];
 				key_count++;
 				break;
-			case ' ': set_OCR(key1, key2); break;
-			default: break;
+			case ' ': 
+				set_OCR(key1, key2);
+				key_count++;
+				end_of_note = 1;
+				break;
+			default: key_count++; break;
+		}
 		}
 	}
 	count++;
