@@ -67,7 +67,7 @@ char key1, key2, key3;
 				key_count++;
 				break;
 			case ' ': 
-				set_OCR(key1, key2);
+				set_OCR(key1, key2, key3);
 				key_count++;
 				end_of_note = 1;
 				break;
@@ -80,7 +80,7 @@ char key1, key2, key3;
 
 
 
-void set_OCR(char key1, char key2, char key 3)
+void set_OCR(char key1, char key2, char key3)
 {
 	uint8_t x = 1;
 	uint16_t f_oc = 0;
