@@ -138,3 +138,9 @@ void set_OCR(char key1, char key2, char key3)
 	OCR1A = (16000000/(2*f_oc))-1;
 	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*(uint32_t)x)/1000;
 }
+
+void sound_stop(void){
+	TIMSK1 	&= 	~(1<<OCIE1A);
+	
+
+}

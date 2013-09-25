@@ -60,6 +60,7 @@ int main( void )
 		while(key!=0x76){
 			 key = get_new_key();
 		}
+		sound_stop();
 		for(uint8_t i = 0; i<count; i++){
 			string[i] = 0;
 		}
