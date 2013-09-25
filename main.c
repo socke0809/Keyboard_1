@@ -46,22 +46,28 @@ int main( void )
 	for(uint8_t i = 0; i<25; i++){
 		string[i] = 0;
 	}
-	sound_init(string);
+	
     while(1){
 	
 		//uint8_t data;
 		//int8_t ret;
 		//char* keys; 
-		char key = get_new_key();
+	char key = get_new_key();
 		
 
-		
-		//keys = ps2_get_keys();
-	
-		if(key!= 0 && count < 25){
-			string[count] = key;
-			count++;
+	if(key == 0x5a){
+		sound_init(&string);
+		while(key!=0x76){
+			 key = get_new_key();
 		}
+	}	
+
+	if(key!= 0 && count < 25){
+		string[count] = key;
+		count++;
+		}
+		
+		
 		
 		uart_send_string(string);
 		uart_send_byte('\r');

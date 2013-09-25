@@ -12,7 +12,7 @@ volatile uint8_t key_count;
 
 
 
-void sound_init(char strg[25]){
+void sound_init(char *strg){
 	TCCR1A	 = 	0;
 	TCCR1B 	|= 	(1<<CS10) | (1<<WGM12); //sets prescaler 1
 	OCR1A	 = 	30000;	//timer stops counting at 30000
@@ -27,7 +27,7 @@ void sound_init(char strg[25]){
 	
 ISR (TIMER1_COMPA_vect){
 static uint16_t count = 0;
-static uint8_t end_of_note = 0;
+uint8_t end_of_note = 0;
 char key1, key2;
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 	if(count == count_max){
