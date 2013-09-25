@@ -8,7 +8,7 @@
 
 volatile uint16_t count_max;
 volatile char string[25];
-volatile uint8_t key_count;
+volatile uint8_t key_count = 0;
 
 
 
@@ -37,6 +37,7 @@ char key3 = 1;
 		switch(string[key_count]){
 			case '\0': 
 				TIMSK1 &= 	~(1<<OCIE1A);
+				SOUND_SIGNAL_PORT |= (1<<SOUND_SIGNAL);
 				key_count = 0;
 				end_of_note = 1;
 				break;
@@ -90,9 +91,9 @@ void set_OCR(char key1, char key2, char key3)
 			switch(key2){
 			case 'c': f_oc = 277; break;
 			case 'd': f_oc = 311; break;
-			case 'g': f_oc = 370; break;
-			case 'a': f_oc = 415; break;
-			case 'h': f_oc = 466; break;
+			case 'f': f_oc = 370; break;
+			case 'g': f_oc = 415; break;
+			case 'a': f_oc = 466; break;
 			default: break;
 			
 			}
@@ -101,9 +102,10 @@ void set_OCR(char key1, char key2, char key3)
 			switch(key2){
 			case 'd': f_oc = 277; break;
 			case 'e': f_oc = 311; break;
-			case 'f': f_oc = 370; break;
-			case 'g': f_oc = 415; break;
-			case 'a': f_oc = 466; break;
+			case 'g': f_oc = 370; break;
+			case 'a': f_oc = 415; break;
+			case 'h': f_oc = 466; break;
+			
 			default: break;
 			}
 			break;
