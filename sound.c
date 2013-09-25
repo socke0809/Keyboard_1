@@ -28,7 +28,8 @@ void sound_init(char *strg){
 ISR (TIMER1_COMPA_vect){
 static uint16_t count = 0;
 uint8_t end_of_note = 0;
-char key1, key2, key3;
+char key1, key2;
+char key3 = 1;
  SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
 	if(count == count_max){
 		count = 0;
@@ -133,5 +134,5 @@ void set_OCR(char key1, char key2, char key3)
 			}
 		
 	OCR1A = (16000000/(2*f_oc))-1;
-	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*x)/1000;
+	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*(uint32_t)x)/1000;
 }
