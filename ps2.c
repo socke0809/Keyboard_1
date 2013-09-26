@@ -166,9 +166,7 @@ char get_new_key(void){
 			case 0x46: actKey = '9'; break;
 			case 0x5d: actKey = '#'; break;
 			case 0x29: actKey = ' ' ; break;
-			
-			default: actKey = data;
-			break;
+			default: actKey = data; break;
 		}
 		
 		if(breakCode == 0){

@@ -60,11 +60,13 @@ int main( void )
 		while(key!=0x76){
 			 key = get_new_key();
 		}
+		cli();
 		sound_stop();
-		for(uint8_t i = 0; i<count; i++){
+		for(uint8_t i = 0; i<25; i++){
 			string[i] = 0;
 		}
 		count = 0;
+		sei();
 	}	
 
 	if(key!= 0 && count < 25){
