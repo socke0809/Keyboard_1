@@ -53,10 +53,14 @@ int main( void )
 		//int8_t ret;
 		//char* keys; 
 	char key = get_new_key();
-		
-
-	if(key == 0x5a){
+	
+	if(key!= 0 && count < 25 && key != 0x5a ){
+		string[count] = key;
+		count++;
+		}
+	else if(key == 0x5a){
 		sound_init(&string);
+		
 		while(key!=0x76){
 			 key = get_new_key();
 		}
@@ -67,12 +71,10 @@ int main( void )
 		}
 		count = 0;
 		sei();
-	}	
+	}
 
-	if(key!= 0 && count < 25){
-		string[count] = key;
-		count++;
-		}
+		
+
 		
 		
 		

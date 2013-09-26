@@ -94,6 +94,7 @@ void set_OCR(char key1, char key2, char key3)
 			case 'f': f_oc = 370; break;
 			case 'g': f_oc = 415; break;
 			case 'a': f_oc = 466; break;
+			//case ' ': break;
 			default: break;
 			
 			}
@@ -105,8 +106,8 @@ void set_OCR(char key1, char key2, char key3)
 			case 'g': f_oc = 370; break;
 			case 'a': f_oc = 415; break;
 			case 'h': f_oc = 466; break;
-			
-			default: break;
+			//case ' ': break;
+			default:  f_oc = 1000; break;
 			}
 			break;
 		default:
@@ -118,7 +119,8 @@ void set_OCR(char key1, char key2, char key3)
 			case 'g': f_oc = 396; break;
 			case 'a': f_oc = 440; break;
 			case 'h': f_oc = 495; break;
-			default: break;
+			//case ' ': break;
+			default: f_oc = 1000; break;
 			}
 			break;
 	}
@@ -132,7 +134,8 @@ void set_OCR(char key1, char key2, char key3)
 			case '7': x = 7; break;
 			case '8': x = 8; break;
 			case '9': x = 9; break;
-			default: break;
+			
+			default:  break;
 			}
 		
 	OCR1A = (16000000/(2*f_oc))-1;
@@ -141,6 +144,8 @@ void set_OCR(char key1, char key2, char key3)
 
 void sound_stop(void){
 	TIMSK1 	&= 	~(1<<OCIE1A);
-	
+	for(uint8_t i = 0; i<25; i++){
+		string[i] = 0;
+	}
 
 }
