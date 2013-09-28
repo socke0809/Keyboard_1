@@ -6,7 +6,7 @@
 #include "ps2.h"
 
 
-volatile uint16_t count_max;
+volatile uint16_t count_max = 0;
 volatile char string[25];
 volatile uint8_t key_count = 0;
 
@@ -22,6 +22,8 @@ void sound_init(char *strg){
 		string[i] = strg[i];
 	}
 	key_count = 0;
+	count_max = 0;
+
 }
 	
 	
@@ -94,8 +96,7 @@ void set_OCR(char key1, char key2, char key3)
 			case 'f': f_oc = 370; break;
 			case 'g': f_oc = 415; break;
 			case 'a': f_oc = 466; break;
-			//case ' ': break;
-			default: break;
+			default: f_oc = 1000; break;
 			
 			}
 			break;
@@ -119,7 +120,6 @@ void set_OCR(char key1, char key2, char key3)
 			case 'g': f_oc = 396; break;
 			case 'a': f_oc = 440; break;
 			case 'h': f_oc = 495; break;
-			//case ' ': break;
 			default: f_oc = 1000; break;
 			}
 			break;
@@ -134,8 +134,8 @@ void set_OCR(char key1, char key2, char key3)
 			case '7': x = 7; break;
 			case '8': x = 8; break;
 			case '9': x = 9; break;
-			
-			default:  break;
+
+			default: f_oc = 1000; break;
 			}
 		
 	OCR1A = (16000000/(2*f_oc))-1;
