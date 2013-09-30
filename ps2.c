@@ -102,6 +102,12 @@ char* ps2_get_keys(void){
 	}
 
 	return ps2KeyArray;
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+}
+=======
+>>>>>>> master
 }
 
 
@@ -177,4 +183,3 @@ char get_new_key(void){
 	return 0;
 }
 	
-

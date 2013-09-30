@@ -15,4 +15,3 @@ char ps2_get_new_key(void);
 
 
 #endif
-
