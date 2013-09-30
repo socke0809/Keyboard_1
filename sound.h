@@ -11,7 +11,7 @@
 #define SOUND_PERIOD		250 // in ms
 
 void sound_init(char *strg);
-void set_OCR(char key1, char key2, char key3);
+void set_OCR(char key1, char key2, char key3, char key4);
 void sound_stop(void);
 
 #endif
