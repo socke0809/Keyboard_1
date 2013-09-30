@@ -16,7 +16,6 @@ void sound_init(char *strg){
 	TCCR1A	 = 	0;
 	TCCR1B 	|= 	(1<<CS10) | (1<<WGM12); //sets prescaler 1
 	OCR1A	 = 	30000;	//timer stops counting at 30000
-	TIMSK1 	|= 	(1<<OCIE1A); //enables interrupt
 	SOUND_SIGNAL_DDR |= (1<<SOUND_SIGNAL); //sets sound_signal as output
 	for(uint8_t i = 0; i < 25; i++){
 		string[i] = strg[i];
@@ -24,63 +23,64 @@ void sound_init(char *strg){
 	key_count = 0;
 	count_max = 0;
 
+	TIMSK1 	|= 	(1<<OCIE1A); //enables interrupt
 }
 	
 	
 ISR (TIMER1_COMPA_vect){
-static uint16_t count = 0;
-uint8_t end_of_note = 0;
-char key1, key2;
-char key3 = 1;
- SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
-	if(count == count_max){
-		count = 0;
-		while(end_of_note == 0){
-		switch(string[key_count]){
-			case '\0': 
-				TIMSK1 &= 	~(1<<OCIE1A);
-				SOUND_SIGNAL_PORT |= (1<<SOUND_SIGNAL);
-				key_count = 0;
-				end_of_note = 1;
-				break;
-			case '#': 
-			case 'b': 
-				key1 = string[key_count];
-				key_count++;
-				break;
-			case 'c':
-			case 'd':
-			case 'e':
-			case 'f':
-			case 'g':
-			case 'a':
-			case 'h':
-				key2 =string[key_count];
-				key_count++;
-				break;
-			case '1':
-			case '2':
-			case '3':
-			case '4':
-			case '5':
-			case '6':
-			case '7':
-			case '8':
-			case '9':
-				key3 = string[key_count];
-				key_count++;
-				break;
-			case ' ': 
-				set_OCR(key1, key2, key3);
-				key_count++;
-				end_of_note = 1;
-				break;
-			default: key_count++; break;
-		}
-		}
-	}else{
-		count++;
-	}
+    static uint16_t count = 0;
+    uint8_t end_of_note = 0;
+    char key1, key2;
+    char key3 = 1;
+    SOUND_SIGNAL_PORT ^= (1<<SOUND_SIGNAL);
+    if(count == count_max){
+        count = 0;
+        while(end_of_note == 0){
+            switch(string[key_count]){
+                case '\0': 
+                    TIMSK1 &= 	~(1<<OCIE1A);
+                    SOUND_SIGNAL_PORT |= (1<<SOUND_SIGNAL);
+                    key_count = 0;
+                    end_of_note = 1;
+                    break;
+                case '#': 
+                case 'b': 
+                    key1 = string[key_count];
+                    key_count++;
+                    break;
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'a':
+                case 'h':
+                    key2 =string[key_count];
+                    key_count++;
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    key3 = string[key_count];
+                    key_count++;
+                    break;
+                case ' ': 
+                    set_OCR(key1, key2, key3);
+                    key_count++;
+                    end_of_note = 1;
+                    break;
+                default: key_count++; break;
+            }
+        }
+    }else{
+        count++;
+    }
 }
 
 
