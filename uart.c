@@ -29,3 +29,4 @@ void uart_send_string( char *str )
         uart_send_byte(str[i]);
     }
 }
+
