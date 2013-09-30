@@ -16,7 +16,7 @@ void sound_init(char *strg){
 	TCCR1A	 = 	0;
 	TCCR1B 	|= 	(1<<CS10) | (1<<WGM12); //sets prescaler 1
 	OCR1A	 = 	30000;	//timer stops counting at 30000
-	TIMSK1 	|= 			(1<<OCIE1A); //enables interrupt
+	TIMSK1 	|= 	(1<<OCIE1A); //enables interrupt
 	SOUND_SIGNAL_DDR |= (1<<SOUND_SIGNAL); //sets sound_signal as output
 	for(uint8_t i = 0; i < 25; i++){
 		string[i] = strg[i];
@@ -135,7 +135,7 @@ void set_OCR(char key1, char key2, char key3)
 			case '8': x = 8; break;
 			case '9': x = 9; break;
 
-			default: f_oc = 1000; break;
+			default: x = 1; break;
 			}
 		
 	OCR1A = (16000000/(2*f_oc))-1;
@@ -144,6 +144,7 @@ void set_OCR(char key1, char key2, char key3)
 
 void sound_stop(void){
 	TIMSK1 	&= 	~(1<<OCIE1A);
+	
 	for(uint8_t i = 0; i<25; i++){
 		string[i] = 0;
 	}

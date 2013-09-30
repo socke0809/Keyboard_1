@@ -59,9 +59,9 @@ int main( void )
 		count++;
 		}
 	else if(key == 0x5a){
-		sound_init(&string);
+		sound_init(string);
 		
-		while(key!=0x76){
+		while(key!= 0x76){
 			 key = get_new_key();
 		}
 		cli();
