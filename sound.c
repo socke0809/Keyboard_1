@@ -78,8 +78,9 @@ char key3 = 1;
 			default: key_count++; break;
 		}
 		}
+	}else{
+		count++;
 	}
-	count++;
 }
 
 
