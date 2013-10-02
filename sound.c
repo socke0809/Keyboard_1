@@ -68,7 +68,7 @@ ISR (TIMER1_COMPA_vect){
                 case '7':
                 case '8':
                 case '9':
-					if(string[key_count-1] != '\''){
+					if(key_count == 0 || string[key_count-1] != '\'' ){
                     key3 = string[key_count];
 					}else{
 					key4 = string[key_count];
@@ -159,7 +159,7 @@ void set_OCR(char key1, char key2, char key3, char key4)
 	
 		
 	OCR1A = (16000000/(2*f_oc))-1;
-	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*(uint32_t)x*2^(uint32_t)n)/1000;
+	count_max = (2*(uint32_t)f_oc*SOUND_PERIOD*(uint32_t)x*2^((uint32_t)n))/1000;
 }
 
 void sound_stop(void){

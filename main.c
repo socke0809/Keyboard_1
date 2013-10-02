@@ -56,6 +56,7 @@ int main( void )
 		//char* keys; 
 	char key = get_new_key();
 	
+	
 	if(key!= 0 && count < 25 && key != 0x5a ){
 		string[count] = key;
 		count++;
